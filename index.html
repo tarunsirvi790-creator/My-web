@@ -34,13 +34,13 @@
         .product-card {
             background: white;
             border-radius: 24px;
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: all 0.4s ease;
             border: 1px solid rgba(184, 134, 11, 0.1);
         }
 
         .product-card:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 20px 40px rgba(184, 134, 11, 0.1);
+            transform: translateY(-8px);
+            box-shadow: 0 15px 30px rgba(184, 134, 11, 0.1);
         }
 
         .nav-active {
@@ -63,57 +63,49 @@
 </head>
 <body class="overflow-x-hidden">
 
-    <!-- Premium Header -->
+    <!-- Header Section -->
     <header class="hero-gradient shadow-sm">
-        <div class="max-w-7xl mx-auto px-6 py-12 flex flex-col items-center text-center">
-            <div class="mb-6 p-5 bg-white rounded-full shadow-2xl border border-white/50 animate-bounce">
+        <div class="max-w-7xl mx-auto px-6 py-10 flex flex-col items-center text-center">
+            <div class="mb-5 p-4 bg-white rounded-full shadow-2xl border border-white/50">
                 <i class="fas fa-crown text-5xl text-[#B8860B]"></i>
             </div>
-            <h1 class="brand-font text-4xl md:text-7xl text-gray-800 font-bold uppercase tracking-tighter">Shree Jagadamba</h1>
-            <p class="brand-font text-xl md:text-3xl text-[#B8860B] tracking-[0.4em] font-semibold mt-1">SELECTION</p>
-            <div class="h-1 w-24 bg-[#B8860B] my-6 rounded-full opacity-40"></div>
-            <p class="text-[10px] font-bold text-gray-500 uppercase tracking-[0.3em] italic">Anavatti, Shivamogga • Karnataka</p>
+            <h1 class="brand-font text-3xl md:text-6xl text-gray-800 font-bold uppercase tracking-tighter text-center">Shree Jagadamba</h1>
+            <p class="brand-font text-lg md:text-2xl text-[#B8860B] tracking-[0.4em] font-semibold mt-1 text-center">SELECTION</p>
+            <div class="h-1 w-20 bg-[#B8860B] my-5 rounded-full opacity-30 mx-auto"></div>
+            <p class="text-[9px] font-bold text-gray-500 uppercase tracking-widest italic text-center text-center">Anavatti, Shivamogga • Karnataka</p>
         </div>
         
-        <!-- Navigation -->
+        <!-- Navigation Menu -->
         <nav class="bg-white/95 sticky top-0 z-50 border-b border-gray-100 overflow-x-auto no-scrollbar">
-            <div class="max-w-7xl mx-auto flex justify-center space-x-10 py-5 px-8 whitespace-nowrap text-[11px] font-bold uppercase tracking-widest">
-                <a href="javascript:void(0)" onclick="window.filterCategory('All', this)" class="nav-active py-1">Catalogue</a>
-                <a href="javascript:void(0)" onclick="window.filterCategory('Saree', this)" class="text-gray-400 hover:text-[#B8860B] py-1 transition">Sarees</a>
-                <a href="javascript:void(0)" onclick="window.filterCategory('Kurti', this)" class="text-gray-400 hover:text-[#B8860B] py-1 transition">Kurtis</a>
-                <a href="javascript:void(0)" onclick="window.filterCategory('Kids Wear', this)" class="text-gray-400 hover:text-[#B8860B] py-1 transition">Kids Wear</a>
-                <a href="javascript:void(0)" onclick="window.filterCategory('Mens Wear', this)" class="text-gray-400 hover:text-[#B8860B] py-1 transition">Mens Wear</a>
-                <a href="javascript:void(0)" onclick="window.filterCategory('Other', this)" class="text-gray-400 hover:text-[#B8860B] py-1 transition">Other</a>
+            <div class="max-w-7xl mx-auto flex justify-center space-x-10 py-4 px-8 whitespace-nowrap text-[10px] font-bold uppercase tracking-widest">
+                <a id="cat-All" href="javascript:void(0)" onclick="window.filterCategory('All', this)" class="nav-active py-1">Catalogue</a>
+                <a id="cat-Saree" href="javascript:void(0)" onclick="window.filterCategory('Saree', this)" class="text-gray-400 py-1 transition">Sarees</a>
+                <a id="cat-Kurti" href="javascript:void(0)" onclick="window.filterCategory('Kurti', this)" class="text-gray-400 py-1 transition">Kurtis</a>
+                <a id="cat-Kids" href="javascript:void(0)" onclick="window.filterCategory('Kids Wear', this)" class="text-gray-400 py-1 transition">Kids Wear</a>
+                <a id="cat-Mens" href="javascript:void(0)" onclick="window.filterCategory('Mens Wear', this)" class="text-gray-400 py-1 transition">Mens Wear</a>
+                <a id="cat-Other" href="javascript:void(0)" onclick="window.filterCategory('Other', this)" class="text-gray-400 py-1 transition">Other</a>
             </div>
         </nav>
     </header>
 
-    <!-- Admin Panel (Dashboard) -->
-    <section id="adminPanel" class="hidden max-w-6xl mx-auto mt-8 p-8 bg-white rounded-[2.5rem] shadow-2xl border border-yellow-100 mx-4 lg:mx-auto">
-        <div class="flex flex-col md:flex-row justify-between items-center mb-8 gap-6">
-            <div class="flex items-center gap-4">
-                <div class="w-14 h-14 bg-[#B8860B] rounded-2xl flex items-center justify-center text-white shadow-lg">
-                    <i class="fas fa-user-shield text-2xl"></i>
-                </div>
-                <div>
-                    <h2 class="brand-font text-2xl font-bold text-gray-800">Owner Dashboard</h2>
-                    <p class="text-[10px] text-green-500 font-bold uppercase tracking-widest">Inventory Live Control</p>
-                </div>
-            </div>
-            <button onclick="window.logout()" class="px-6 py-2 bg-red-50 text-red-500 rounded-full font-bold text-xs hover:bg-red-100 transition uppercase tracking-widest">
-                Exit Admin
+    <!-- Owner Dashboard -->
+    <section id="adminPanel" class="hidden max-w-6xl mx-auto mt-8 p-6 bg-white rounded-[2rem] shadow-2xl border border-yellow-100 mx-4 lg:mx-auto">
+        <div class="flex justify-between items-center mb-8">
+            <h2 class="brand-font text-xl font-bold text-gray-800 uppercase">Control Center</h2>
+            <button onclick="window.logout()" class="w-8 h-8 bg-red-50 text-red-500 rounded-full flex items-center justify-center shadow-sm">
+                <i class="fas fa-times"></i>
             </button>
         </div>
         
-        <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
+        <div class="grid grid-cols-1 md:grid-cols-5 gap-3">
             <div class="relative">
-                <input type="file" id="imgInp" class="hidden" accept="image/*" onchange="if(this.files.length) document.getElementById('lTag').innerText='Photo Ready'">
-                <label for="imgInp" id="lTag" class="flex items-center justify-center border-2 border-dashed border-gray-200 rounded-2xl p-4 cursor-pointer bg-gray-50 h-full text-[10px] font-bold text-gray-400 uppercase text-center shadow-inner">
-                    Select Product Image
+                <input type="file" id="imgInp" class="hidden" accept="image/*" onchange="if(this.files.length) document.getElementById('lTag').innerText='Photo Taiyaar Hai'">
+                <label for="imgInp" id="lTag" class="flex items-center justify-center border-2 border-dashed border-gray-200 rounded-2xl p-4 cursor-pointer bg-gray-50 h-full text-[9px] font-bold text-gray-400 uppercase text-center shadow-inner">
+                    Photo Chunein
                 </label>
             </div>
-            <input type="text" id="itemName" placeholder="Item Name" class="bg-gray-50 border border-gray-100 p-4 rounded-2xl text-sm outline-none focus:ring-2 focus:ring-[#B8860B]/20">
-            <input type="text" id="itemPrice" placeholder="Price (₹)" class="bg-gray-50 border border-gray-100 p-4 rounded-2xl text-sm outline-none focus:ring-2 focus:ring-[#B8860B]/20">
+            <input type="text" id="itemName" placeholder="Saman ka Naam" class="bg-gray-50 border border-gray-100 p-4 rounded-2xl text-sm outline-none">
+            <input type="text" id="itemPrice" placeholder="Keemat (₹)" class="bg-gray-50 border border-gray-100 p-4 rounded-2xl text-sm outline-none">
             <select id="itemCat" class="bg-gray-50 border border-gray-100 p-4 rounded-2xl text-sm font-bold text-gray-600">
                 <option value="Saree">Saree</option>
                 <option value="Kurti">Kurti</option>
@@ -121,129 +113,121 @@
                 <option value="Mens Wear">Mens Wear</option>
                 <option value="Other">Other</option>
             </select>
-            <button onclick="window.addItem()" class="bg-[#B8860B] text-white font-black py-4 rounded-2xl shadow-xl uppercase text-xs tracking-widest hover:bg-[#966d09] transition active:scale-95">
-                Upload Stock
+            <button onclick="window.addItem()" class="bg-[#B8860B] text-white font-black py-4 rounded-2xl shadow-xl uppercase text-xs tracking-widest active:scale-95 transition">
+                Stock Mein Dalein
             </button>
         </div>
     </section>
 
-    <!-- Main Catalogue -->
-    <main class="max-w-7xl mx-auto px-6 py-16">
-        <div class="text-center mb-12">
-            <h3 class="brand-font text-3xl md:text-5xl text-gray-800 font-bold uppercase">Our Selection</h3>
-            <p class="text-[10px] text-red-500 font-bold uppercase tracking-[0.2em] mt-3 italic">
-                ⚠️ Store Visit Only • <span id="itemCount">0</span> Items Online
+    <!-- Main Grid -->
+    <main class="max-w-7xl mx-auto px-4 py-12">
+        <div class="text-center mb-10">
+            <h3 class="brand-font text-2xl text-gray-800 font-bold uppercase tracking-wider text-center">Catalogue Selection</h3>
+            <p class="text-[9px] text-red-500 font-bold uppercase mt-2 italic text-center underline decoration-red-200">
+                ⚠️ Sirf Showroom Par Milega • <span id="itemCount">0</span> Items Listed
             </p>
         </div>
-
-        <div id="productGrid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 md:gap-12">
-            <!-- Dynamic Data -->
+        <div id="productGrid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-10">
+            <!-- Saman yahan dikhega -->
         </div>
     </main>
 
-    <!-- Footer Section -->
-    <footer class="bg-white py-20 border-t border-gray-100 mt-10">
+    <!-- Footer -->
+    <footer class="bg-white py-16 text-center border-t border-gray-100 mt-10">
         <div class="max-w-4xl mx-auto px-6 text-center">
-            <div class="flex flex-col md:flex-row items-center justify-center gap-6 mb-16">
-                <div class="bg-gray-50 p-8 rounded-[2rem] border border-gray-100 flex-1">
-                    <i class="fas fa-clock text-[#B8860B] text-2xl mb-3"></i>
-                    <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Showroom Hours</p>
-                    <p class="text-sm font-bold text-gray-800">10:00 AM – 9:00 PM</p>
-                </div>
-                <div class="bg-red-50 p-8 rounded-[2rem] border border-red-50 flex-1">
-                    <i class="fas fa-info-circle text-red-500 text-2xl mb-3"></i>
-                    <p class="text-[10px] font-bold text-red-400 uppercase tracking-widest mb-1">Policy</p>
-                    <p class="text-[11px] font-bold text-red-600">Physical Purchase Only. No Delivery.</p>
-                </div>
+            <div class="flex items-center justify-center gap-4 text-gray-700 font-bold bg-[#fffaf0] p-5 rounded-[2rem] border border-[#f3e5ab] mb-10 mx-auto w-fit">
+                <i class="fas fa-clock text-[#B8860B]"></i>
+                <span class="tracking-widest uppercase text-[10px]">Daily: 10:00 AM – 9:00 PM</span>
             </div>
-
-            <h2 class="brand-font text-2xl text-gray-800 font-bold uppercase tracking-widest">Shree Jagadamba Selection</h2>
-            <p class="text-[10px] text-gray-400 uppercase tracking-[0.4em] mt-2 mb-12">Anavatti, Shivamogga</p>
             
-            <button onclick="window.openLogin()" class="group flex items-center gap-3 text-[11px] text-gray-400 hover:text-[#B8860B] border border-gray-100 px-10 py-4 rounded-full transition-all hover:bg-white hover:shadow-2xl font-bold uppercase tracking-widest">
-                <i class="fas fa-lock text-[10px] group-hover:rotate-12 transition"></i> Owner Login
+            <h2 class="brand-font text-2xl text-gray-800 font-bold uppercase tracking-widest text-center">Shree Jagadamba Selection</h2>
+            <p class="text-[9px] text-gray-400 uppercase tracking-[0.4em] mt-2 mb-12 text-center text-center">Anavatti, Shivamogga</p>
+            
+            <button id="loginBtn" onclick="window.openLogin()" class="group flex items-center gap-3 text-[10px] text-gray-400 hover:text-[#B8860B] border border-gray-100 px-10 py-3 rounded-full transition-all font-bold uppercase tracking-widest mx-auto">
+                <i class="fas fa-lock"></i> Owner Login
             </button>
         </div>
     </footer>
 
-    <!-- Owner Login Modal -->
+    <!-- Modal Login -->
     <div id="loginModal" class="hidden fixed inset-0 modal-overlay flex items-center justify-center p-6">
         <div class="bg-white rounded-[2.5rem] p-10 max-w-sm w-full shadow-2xl">
-            <div class="text-center mb-8">
-                <div class="w-20 h-20 bg-gray-50 text-[#B8860B] rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-inner">
-                    <i class="fas fa-key text-3xl"></i>
-                </div>
-                <h2 class="brand-font text-2xl font-bold text-gray-800 uppercase">Security Login</h2>
+            <div class="text-center mb-8 text-center">
+                <h2 class="brand-font text-xl font-bold text-gray-800 uppercase text-center">Owner Access</h2>
             </div>
-            <div class="space-y-4">
-                <input type="password" id="passInput" placeholder="Password" class="w-full p-5 bg-gray-50 border border-gray-100 rounded-2xl text-center font-bold tracking-[0.4em] text-xl outline-none focus:ring-4 focus:ring-[#B8860B]/10">
-                <div class="flex gap-4 pt-4">
-                    <button onclick="window.closeLogin()" class="flex-1 py-3 text-xs font-bold text-gray-400 uppercase">Cancel</button>
-                    <button onclick="window.verifyAdmin()" class="flex-[2] py-4 bg-[#B8860B] text-white rounded-2xl text-xs font-black shadow-lg uppercase tracking-widest">Login</button>
-                </div>
+            <input type="password" id="passInput" placeholder="Password" class="w-full p-5 bg-gray-50 border rounded-2xl text-center font-bold tracking-[0.4em] text-xl outline-none mb-6">
+            <div class="flex gap-4">
+                <button onclick="window.closeLogin()" class="flex-1 py-3 text-xs font-bold text-gray-400 uppercase">Cancel</button>
+                <button onclick="window.verifyAdmin()" class="flex-[2] py-4 bg-[#B8860B] text-white rounded-2xl text-xs font-black shadow-lg uppercase tracking-widest active:scale-95 transition">Verify</button>
             </div>
         </div>
     </div>
 
-    <!-- Firebase Logic -->
+    <!-- Firebase Logic with Stability Fix -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, collection, onSnapshot, addDoc, deleteDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // CONFIG (ENVIRONMENT)
+        // Firebase Setup
         const firebaseConfig = JSON.parse(__firebase_config);
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'sjs-showroom-anavatti';
+        
+        // RULE 1: Correct appId path
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
 
         let selectedCategory = 'All';
-        let user = null;
+        let currentUser = null;
 
-        // BINDING TO WINDOW FOR GLOBAL ACCESS
-        window.openLogin = () => {
-            document.getElementById('loginModal').classList.remove('hidden');
-            document.getElementById('passInput').focus();
-        };
-
-        window.closeLogin = () => {
-            document.getElementById('loginModal').classList.add('hidden');
-            document.getElementById('passInput').value = '';
-        };
-
-        window.logout = () => {
-            document.getElementById('adminPanel').classList.add('hidden');
-            document.body.classList.remove('admin-active');
-        };
-
+        // GLOBAL FUNCTIONS
+        window.openLogin = () => document.getElementById('loginModal').classList.remove('hidden');
+        window.closeLogin = () => { document.getElementById('loginModal').classList.add('hidden'); document.getElementById('passInput').value = ''; };
+        window.logout = () => { document.getElementById('adminPanel').classList.add('hidden'); document.body.classList.remove('admin-active'); };
+        
         window.verifyAdmin = () => {
             if (document.getElementById('passInput').value === "sirvitarun9828") {
                 document.getElementById('adminPanel').classList.remove('hidden');
                 document.body.classList.add('admin-active');
                 window.closeLogin();
                 window.scrollTo({top:0, behavior:'smooth'});
-            } else { alert("Wrong Password!"); }
+            } else { alert("Galat Password!"); }
         };
 
         window.filterCategory = (cat, el) => {
             selectedCategory = cat;
             document.querySelectorAll('nav a').forEach(a => a.className = "text-gray-400 hover:text-[#B8860B] py-1 transition");
             el.className = "nav-active py-1";
-            loadStock();
+            if(currentUser) loadStock();
         };
 
-        // CORE LOGIC
+        // RULE 3: Auth Before Queries
         async function start() {
             try {
-                const cred = await signInAnonymously(auth);
-                user = cred.user;
-                if (user) loadStock();
-            } catch (e) { console.error(e); }
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    await signInWithCustomToken(auth, __initial_auth_token);
+                } else {
+                    await signInAnonymously(auth);
+                }
+            } catch (e) {
+                console.error("Auth failed:", e);
+            }
         }
 
+        onAuthStateChanged(auth, (user) => {
+            currentUser = user;
+            if (user) {
+                loadStock();
+            }
+        });
+
         function loadStock() {
+            if (!currentUser) return;
+            // RULE 1: Strict path for public data
             const pRef = collection(db, 'artifacts', appId, 'public', 'data', 'products');
+            
+            // RULE 2: No complex queries, filter in JS
             onSnapshot(pRef, (snap) => {
                 const grid = document.getElementById('productGrid');
                 grid.innerHTML = '';
@@ -256,6 +240,8 @@
                     }
                 });
                 document.getElementById('itemCount').innerText = count;
+            }, (error) => {
+                console.error("Firestore Error:", error);
             });
         }
 
@@ -263,48 +249,11 @@
             const div = document.createElement('div');
             div.className = "product-card overflow-hidden group relative";
             div.innerHTML = `
-                <button onclick="window.deleteItem('${id}')" class="delete-btn absolute top-3 right-3 z-10 bg-red-500 text-white w-9 h-9 rounded-full flex items-center justify-center shadow-lg active:scale-90">
-                    <i class="fas fa-trash-alt text-sm"></i>
-                </button>
-                <div class="aspect-[3/4] overflow-hidden">
-                    <img src="${data.imageUrl}" class="w-full h-full object-cover transition duration-1000 group-hover:scale-110">
-                </div>
-                <div class="p-5 text-center">
-                    <h4 class="brand-font font-bold text-gray-800 text-xs uppercase tracking-wider">${data.name}</h4>
-                    <p class="text-[9px] text-gray-400 uppercase tracking-widest mt-1">${data.category}</p>
-                    <p class="text-lg font-bold text-[#B8860B] mt-2">₹${data.price}</p>
-                    <div class="mt-3 py-1 px-3 bg-gray-50 rounded-full text-[8px] font-bold text-gray-400 uppercase italic">In Store Only</div>
+                <button onclick="window.deleteItem('${id}')" class="delete-btn absolute top-3 right-3 z-10 bg-red-500 text-white w-9 h-9 rounded-full flex items-center justify-center"><i class="fas fa-trash text-xs"></i></button>
+                <div class="aspect-[3/4] overflow-hidden"><img src="${data.imageUrl}" class="w-full h-full object-cover"></div>
+                <div class="p-4 text-center">
+                    <h4 class="brand-font text-[10px] font-bold uppercase truncate">${data.name}</h4>
+                    <p class="text-lg font-bold text-[#B8860B] mt-1">₹${data.price}</p>
                 </div>`;
             return div;
         }
-
-        window.addItem = async () => {
-            const name = document.getElementById('itemName').value;
-            const price = document.getElementById('itemPrice').value;
-            const category = document.getElementById('itemCat').value;
-            const file = document.getElementById('imgInp').files[0];
-            
-            if (!name || !price || !file) { alert("Details missing!"); return; }
-            
-            const reader = new FileReader();
-            reader.readAsDataURL(file);
-            reader.onload = async () => {
-                await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'products'), {
-                    name, price, category, imageUrl: reader.result, timestamp: serverTimestamp()
-                });
-                alert("Stock Added!");
-                document.getElementById('itemName').value = '';
-                document.getElementById('itemPrice').value = '';
-            };
-        };
-
-        window.deleteItem = async (id) => {
-            if (confirm("Delete this?")) {
-                await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'products', id));
-            }
-        };
-
-        start();
-    </script>
-</body>
-</html>
