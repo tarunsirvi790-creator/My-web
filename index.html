@@ -1,311 +1,146 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Shree Jagadamba Selection | Premium Fashion Showroom</title>
-    
-    <!-- Tailwind CSS & Icons -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Poppins:wght@300;400;500;600&display=swap');
-        
-        :root {
-            --gold: #B8860B;
-            --cream: #FFFAF0;
-            --dark: #2D2424;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Shree Jagadamba Selection</title>
 
-        body { 
-            font-family: 'Poppins', sans-serif; 
-            background-color: var(--cream); 
-            color: var(--dark); 
-            -webkit-tap-highlight-color: transparent; 
-        }
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
-        .brand-font { font-family: 'Playfair Display', serif; }
-        
-        .hero-gradient {
-            background: linear-gradient(135deg, #ffffff 0%, #f3e5ab 100%);
-        }
-
-        .product-card {
-            background: white;
-            border-radius: 24px;
-            transition: all 0.4s ease;
-            border: 1px solid rgba(184, 134, 11, 0.1);
-        }
-
-        .product-card:hover {
-            transform: translateY(-8px);
-            box-shadow: 0 15px 30px rgba(184, 134, 11, 0.1);
-        }
-
-        .nav-active {
-            color: var(--gold);
-            border-bottom: 2px solid var(--gold);
-            font-weight: 700;
-        }
-
-        .modal-overlay {
-            background: rgba(0, 0, 0, 0.85);
-            backdrop-filter: blur(8px);
-            z-index: 1000;
-        }
-
-        .delete-btn { display: none; }
-        body.admin-active .delete-btn { display: flex; }
-
-        .no-scrollbar::-webkit-scrollbar { display: none; }
-        
-        .loader {
-            border: 3px solid #f3f3f3;
-            border-top: 3px solid var(--gold);
-            border-radius: 50%;
-            width: 24px;
-            height: 24px;
-            animation: spin 1s linear infinite;
-        }
-
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-    </style>
+<style>
+body{font-family:Poppins,sans-serif;background:#fffaf0}
+.product-card{background:#fff;border-radius:20px;overflow:hidden;cursor:pointer}
+.delete-btn{display:none}
+body.admin-active .delete-btn{display:flex}
+</style>
 </head>
-<body class="overflow-x-hidden">
 
-    <!-- Header -->
-    <header class="hero-gradient shadow-sm">
-        <div class="max-w-7xl mx-auto px-6 py-10 flex flex-col items-center text-center">
-            <div class="mb-5 p-4 bg-white rounded-full shadow-2xl border border-white/50">
-                <i class="fas fa-crown text-4xl text-[#B8860B]"></i>
-            </div>
-            <h1 class="brand-font text-3xl md:text-6xl text-gray-800 font-bold uppercase tracking-tighter">Shree Jagadamba</h1>
-            <p class="brand-font text-lg md:text-2xl text-[#B8860B] tracking-[0.4em] font-semibold mt-1">SELECTION</p>
-            <div class="h-1 w-20 bg-[#B8860B] my-5 rounded-full opacity-30 mx-auto"></div>
-            <p class="text-[9px] font-bold text-gray-500 uppercase tracking-widest italic">Anavatti, Shivamogga • Karnataka</p>
-        </div>
-        
-        <!-- Navigation -->
-        <nav class="bg-white/95 sticky top-0 z-50 border-b border-gray-100 overflow-x-auto no-scrollbar">
-            <div class="max-w-7xl mx-auto flex justify-center space-x-10 py-4 px-8 whitespace-nowrap text-[10px] font-bold uppercase tracking-widest">
-                <a id="cat-All" href="javascript:void(0)" onclick="window.filterCategory('All', this)" class="nav-active py-1">Catalogue</a>
-                <a id="cat-Saree" href="javascript:void(0)" onclick="window.filterCategory('Saree', this)" class="text-gray-400 py-1 transition">Sarees</a>
-                <a id="cat-Kurti" href="javascript:void(0)" onclick="window.filterCategory('Kurti', this)" class="text-gray-400 py-1 transition">Kurtis</a>
-                <a id="cat-Kids" href="javascript:void(0)" onclick="window.filterCategory('Kids Wear', this)" class="text-gray-400 py-1 transition">Kids Wear</a>
-                <a id="cat-Mens" href="javascript:void(0)" onclick="window.filterCategory('Mens Wear', this)" class="text-gray-400 py-1 transition">Mens Wear</a>
-                <a id="cat-Other" href="javascript:void(0)" onclick="window.filterCategory('Other', this)" class="text-gray-400 py-1 transition">Other</a>
-            </div>
-        </nav>
-    </header>
+<body>
 
-    <!-- Admin Panel -->
-    <section id="adminPanel" class="hidden max-w-6xl mx-auto mt-8 p-6 bg-white rounded-[2rem] shadow-2xl border border-yellow-100 mx-4 lg:mx-auto">
-        <div class="flex justify-between items-center mb-6">
-            <h2 class="brand-font text-xl font-bold text-gray-800 uppercase">Control Center</h2>
-            <button onclick="window.logout()" class="w-8 h-8 bg-red-50 text-red-500 rounded-full flex items-center justify-center shadow-sm"><i class="fas fa-times"></i></button>
-        </div>
-        <div class="grid grid-cols-1 md:grid-cols-5 gap-3">
-            <div class="relative">
-                <input type="file" id="imgInp" class="hidden" accept="image/*" onchange="if(this.files.length) document.getElementById('lTag').innerText='Photo Ready'">
-                <label for="imgInp" id="lTag" class="flex items-center justify-center border-2 border-dashed border-gray-200 rounded-2xl p-4 cursor-pointer bg-gray-50 h-full text-[9px] font-bold text-gray-400 uppercase text-center">Photo Chunein</label>
-            </div>
-            <input type="text" id="itemName" placeholder="Item Name" class="bg-gray-50 border p-4 rounded-2xl text-sm outline-none">
-            <input type="text" id="itemPrice" placeholder="Price (₹)" class="bg-gray-50 border p-4 rounded-2xl text-sm outline-none">
-            <select id="itemCat" class="bg-gray-50 border p-4 rounded-2xl text-sm font-bold text-gray-600">
-                <option value="Saree">Saree</option>
-                <option value="Kurti">Kurti</option>
-                <option value="Kids Wear">Kids Wear</option>
-                <option value="Mens Wear">Mens Wear</option>
-                <option value="Other">Other</option>
-            </select>
-            <button onclick="window.addItem()" class="bg-[#B8860B] text-white font-black py-4 rounded-2xl shadow-xl uppercase text-xs tracking-widest">Upload Stock</button>
-        </div>
-    </section>
+<header class="text-center py-10">
+<h1 class="text-4xl font-bold">Shree Jagadamba Selection</h1>
+<p class="text-sm text-gray-500">Anavatti, Karnataka</p>
+</header>
 
-    <!-- Main Content -->
-    <main class="max-w-7xl mx-auto px-4 py-12">
-        <div class="text-center mb-10">
-            <h3 class="brand-font text-2xl text-gray-800 font-bold uppercase tracking-wider text-center">Catalogue Selection</h3>
-            <p class="text-[9px] text-red-500 font-bold uppercase mt-2 italic text-center underline decoration-red-200">
-                ⚠️ Store Visit Only • <span id="itemCount">0</span> Items Listed
-            </p>
-        </div>
-        
-        <!-- Loading Indicator -->
-        <div id="loadingStatus" class="flex flex-col items-center justify-center py-20 text-gray-400">
-            <div class="loader mb-3"></div>
-            <p class="text-[10px] uppercase tracking-[0.2em]">Dukaan se data jud raha hai...</p>
-        </div>
+<!-- ADMIN PANEL -->
+<section id="adminPanel" class="hidden max-w-5xl mx-auto bg-white p-6 rounded-xl shadow">
+<h2 class="font-bold mb-4">Owner Panel</h2>
 
-        <div id="productGrid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-10"></div>
-    </main>
+<div class="grid md:grid-cols-5 gap-3">
+<input type="file" id="imgInp" accept="image/*" class="bg-gray-100 p-3 rounded">
+<input type="text" id="itemName" placeholder="Item Name" class="bg-gray-100 p-3 rounded">
+<input type="text" id="itemPrice" placeholder="Price ₹" class="bg-gray-100 p-3 rounded">
 
-    <!-- Footer -->
-    <footer class="bg-white py-16 text-center border-t border-gray-100 mt-10">
-        <div class="max-w-4xl mx-auto px-6 text-center">
-            <div class="flex items-center justify-center gap-4 text-gray-700 font-bold bg-[#fffaf0] p-5 rounded-[2rem] border border-[#f3e5ab] mb-10 mx-auto w-fit">
-                <i class="fas fa-clock text-[#B8860B]"></i>
-                <span class="tracking-widest uppercase text-[10px]">Daily: 10:00 AM – 9:00 PM</span>
-            </div>
-            <h2 class="brand-font text-2xl text-gray-800 font-bold uppercase tracking-widest">Shree Jagadamba Selection</h2>
-            <p class="text-[9px] text-gray-400 uppercase tracking-[0.4em] mt-2 mb-12">Anavatti, Shivamogga</p>
-            <button id="loginBtn" onclick="window.openLogin()" class="group flex items-center gap-3 text-[10px] text-gray-400 hover:text-[#B8860B] border border-gray-100 px-10 py-3 rounded-full transition-all font-bold uppercase tracking-widest mx-auto">
-                <i class="fas fa-lock"></i> Owner Login
-            </button>
-        </div>
-    </footer>
+<select id="itemCat" class="bg-gray-100 p-3 rounded">
+<option>Saree</option>
+<option>Kurti</option>
+<option>Kids Wear</option>
+<option>Mens Wear</option>
+<option>Other</option>
+</select>
 
-    <!-- Login Modal -->
-    <div id="loginModal" class="hidden fixed inset-0 modal-overlay flex items-center justify-center p-6">
-        <div class="bg-white rounded-[2.5rem] p-10 max-w-sm w-full shadow-2xl">
-            <h2 class="brand-font text-xl font-bold text-gray-800 uppercase text-center mb-6">Owner Access</h2>
-            <input type="password" id="passInput" placeholder="Password" class="w-full p-5 bg-gray-50 border rounded-2xl text-center font-bold tracking-[0.4em] text-xl outline-none mb-6">
-            <div class="flex gap-4">
-                <button onclick="window.closeLogin()" class="flex-1 py-3 text-xs font-bold text-gray-400 uppercase">Cancel</button>
-                <button onclick="window.verifyAdmin()" class="flex-[2] py-4 bg-[#B8860B] text-white rounded-2xl text-xs font-black shadow-lg uppercase tracking-widest">Verify</button>
-            </div>
-        </div>
-    </div>
+<button onclick="addItem()" class="bg-yellow-600 text-white rounded p-3 font-bold">
+Upload
+</button>
+</div>
+</section>
 
-    <!-- Firebase Logic -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, collection, onSnapshot, addDoc, deleteDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+<!-- PRODUCTS -->
+<main class="max-w-6xl mx-auto p-6 grid grid-cols-2 md:grid-cols-4 gap-4" id="productGrid"></main>
 
-        // Global State
-        let db, auth, appId, user = null;
-        let selectedCategory = 'All';
+<footer class="text-center py-10">
+<button onclick="openLogin()" class="text-sm text-gray-500">
+<i class="fa fa-lock"></i> Owner Login
+</button>
+</footer>
 
-        // --- GLOBAL WINDOW BINDINGS (Buttons Fix) ---
-        window.openLogin = () => document.getElementById('loginModal').classList.remove('hidden');
-        window.closeLogin = () => { document.getElementById('loginModal').classList.add('hidden'); document.getElementById('passInput').value = ''; };
-        window.logout = () => { document.getElementById('adminPanel').classList.add('hidden'); document.body.classList.remove('admin-active'); };
-        
-        window.verifyAdmin = () => {
-            if (document.getElementById('passInput').value === "sirvitarun9828") {
-                document.getElementById('adminPanel').classList.remove('hidden');
-                document.body.classList.add('admin-active');
-                window.closeLogin();
-                window.scrollTo({top:0, behavior:'smooth'});
-            } else { alert("Galat Password!"); }
-        };
+<!-- LOGIN -->
+<div id="loginModal" class="hidden fixed inset-0 bg-black/80 flex items-center justify-center">
+<div class="bg-white p-6 rounded-xl">
+<input type="password" id="passInput" placeholder="Password" class="p-3 border rounded w-full mb-3">
+<button onclick="verifyAdmin()" class="bg-yellow-600 text-white w-full p-3 rounded">Login</button>
+</div>
+</div>
 
-        window.filterCategory = (cat, el) => {
-            selectedCategory = cat;
-            document.querySelectorAll('nav a').forEach(a => { a.classList.remove('text-[#B8860B]', 'nav-active'); a.classList.add('text-gray-400'); });
-            el.classList.remove('text-gray-400'); el.classList.add('text-[#B8860B]', 'nav-active');
-            if(user) loadStock();
-        };
+<script>
+function openLogin(){
+loginModal.classList.remove("hidden")
+}
+function verifyAdmin(){
+if(passInput.value==="sirvitarun9828"){
+adminPanel.classList.remove("hidden")
+document.body.classList.add("admin-active")
+loginModal.classList.add("hidden")
+}else alert("Wrong Password")
+}
+</script>
 
-        // --- INITIALIZATION ---
-        async function start() {
-            try {
-                // Canvas Environment Check
-                const hasConfig = typeof __firebase_config !== 'undefined';
-                if (!hasConfig) {
-                    document.getElementById('loadingStatus').innerHTML = "<p class='text-xs text-amber-600 font-bold'>OFFLINE PREVIEW MODE</p><p class='text-[9px] mt-2 text-gray-400'>Database GitHub par set nahi hai.</p>";
-                    return;
-                }
+<!-- FIREBASE -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+import { getFirestore, collection, addDoc, onSnapshot, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-storage.js";
+import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
 
-                const firebaseConfig = JSON.parse(__firebase_config);
-                appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-                
-                const app = initializeApp(firebaseConfig);
-                auth = getAuth(app);
-                db = getFirestore(app);
+const firebaseConfig = JSON.parse(__firebase_config);
+const app = initializeApp(firebaseConfig);
 
-                // RULE 3: Auth First, then Data
-                onAuthStateChanged(auth, (u) => {
-                    user = u;
-                    if (user) {
-                        document.getElementById('loadingStatus').classList.add('hidden');
-                        loadStock();
-                    } else {
-                        // Attempt Sign-in
-                        if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                            signInWithCustomToken(auth, __initial_auth_token);
-                        } else {
-                            signInAnonymously(auth);
-                        }
-                    }
-                });
+const db = getFirestore(app);
+const storage = getStorage(app);
+const auth = getAuth(app);
+signInAnonymously(auth);
 
-            } catch (e) {
-                console.error("Init Error:", e);
-                document.getElementById('loadingStatus').innerText = "Database connection error.";
-            }
-        }
+const appId = "jagadamba-shop";
 
-        function loadStock() {
-            if (!user || !db) return;
-            // RULE 1: Correct Path
-            const pRef = collection(db, 'artifacts', appId, 'public', 'data', 'products');
-            
-            // RULE 2: Filter in JS Memory
-            onSnapshot(pRef, (snap) => {
-                const grid = document.getElementById('productGrid');
-                grid.innerHTML = '';
-                let count = 0;
-                
-                snap.forEach((doc) => {
-                    const data = doc.data();
-                    if (selectedCategory === 'All' || data.category === selectedCategory) {
-                        grid.appendChild(createCard(doc.id, data));
-                        count++;
-                    }
-                });
-                document.getElementById('itemCount').innerText = count;
-                if (count === 0) {
-                    grid.innerHTML = '<div class="col-span-full py-10 text-center text-gray-400 text-xs tracking-widest uppercase">Abhi koi stock nahi hai.</div>';
-                }
-            }, (err) => {
-                if(err.code === 'permission-denied') {
-                    console.error("RULE 1/3 Violation: Permission Denied.");
-                    document.getElementById('loadingStatus').classList.remove('hidden');
-                    document.getElementById('loadingStatus').innerText = "Permission Error. Refresh Karein.";
-                }
-            });
-        }
+window.addItem = async () => {
+const file = imgInp.files[0];
+const name = itemName.value;
+const price = itemPrice.value;
+const cat = itemCat.value;
 
-        function createCard(id, data) {
-            const div = document.createElement('div');
-            div.className = "product-card overflow-hidden group relative";
-            div.innerHTML = `
-                <button onclick="window.deleteItem('${id}')" class="delete-btn absolute top-3 right-3 z-10 bg-red-500 text-white w-8 h-8 rounded-full flex items-center justify-center shadow-lg"><i class="fas fa-trash-alt text-xs"></i></button>
-                <div class="aspect-[3/4] overflow-hidden bg-gray-50"><img src="${data.imageUrl}" class="w-full h-full object-cover"></div>
-                <div class="p-4 text-center"><h4 class="brand-font text-[10px] font-bold uppercase truncate">${data.name}</h4><p class="text-lg font-bold text-[#B8860B] mt-1">₹${data.price}</p></div>`;
-            return div;
-        }
+if(!file||!name||!price){alert("Fill all");return;}
 
-        window.addItem = async () => {
-            if(!user || !db) { alert("Dukaan se connection nahi hai!"); return; }
-            const name = document.getElementById('itemName').value;
-            const price = document.getElementById('itemPrice').value;
-            const cat = document.getElementById('itemCat').value;
-            const file = document.getElementById('imgInp').files[0];
-            if (!name || !price || !file) { alert("Puri jankari bhariye!"); return; }
-            
-            const reader = new FileReader();
-            reader.readAsDataURL(file);
-            reader.onload = async () => {
-                try {
-                    await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'products'), {
-                        name, price, category: cat, imageUrl: reader.result, timestamp: serverTimestamp()
-                    });
-                    alert("Stock jod diya gaya!");
-                    document.getElementById('itemName').value = '';
-                    document.getElementById('itemPrice').value = '';
-                } catch (e) { alert("Galti: " + e.message); }
-            };
-        };
+const imgRef = ref(storage, `products/${Date.now()}_${file.name}`);
+await uploadBytes(imgRef, file);
+const imageUrl = await getDownloadURL(imgRef);
 
-        window.deleteItem = async (id) => {
-            if (db && confirm("Delete karein?")) await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'products', id));
-        };
+await addDoc(collection(db,"artifacts",appId,"public","data","products"),{
+name,price,category:cat,imageUrl
+});
 
-        start();
-    </script>
+itemName.value="";itemPrice.value="";imgInp.value="";
+};
+
+const grid = document.getElementById("productGrid");
+
+onSnapshot(collection(db,"artifacts",appId,"public","data","products"), snap=>{
+grid.innerHTML="";
+snap.forEach(d=>{
+const p=d.data();
+const div=document.createElement("div");
+div.className="product-card relative";
+
+div.innerHTML=`
+<button class="delete-btn absolute top-2 right-2 bg-red-500 text-white w-8 h-8 rounded-full"
+onclick="deleteItem('${d.id}')">
+<i class="fa fa-trash"></i>
+</button>
+<img src="${p.imageUrl}" class="w-full h-48 object-cover">
+<div class="p-3 text-center">
+<b>${p.name}</b>
+<p class="text-yellow-600 font-bold">₹${p.price}</p>
+</div>`;
+grid.appendChild(div);
+});
+});
+
+window.deleteItem = async (id)=>{
+if(confirm("Delete?")){
+await deleteDoc(doc(db,"artifacts",appId,"public","data","products",id))
+}
+}
+</script>
+
 </body>
-</html>
+    </html>
