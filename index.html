@@ -41,7 +41,7 @@ body.admin-active .delete-btn{display:flex}
 </select>
 
 <button onclick="addItem()" class="bg-yellow-600 text-white rounded p-3 font-bold">
-Upload
+UPLOAD STOCK
 </button>
 </div>
 </section>
@@ -76,16 +76,24 @@ loginModal.classList.add("hidden")
 }
 </script>
 
-<!-- FIREBASE -->
+<!-- 🔥 FIREBASE (MANUAL CONFIG – GITHUB PAGES READY) -->
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
 import { getFirestore, collection, addDoc, onSnapshot, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-storage.js";
 import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
 
-const firebaseConfig = JSON.parse(__firebase_config);
-const app = initializeApp(firebaseConfig);
+/* 🔴 YAHAN APNA FIREBASE CONFIG PASTE KARO */
+const firebaseConfig = {
+  apiKey: "PASTE_HERE",
+  authDomain: "PASTE_HERE",
+  projectId: "PASTE_HERE",
+  storageBucket: "PASTE_HERE",
+  messagingSenderId: "PASTE_HERE",
+  appId: "PASTE_HERE"
+};
 
+const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const storage = getStorage(app);
 const auth = getAuth(app);
@@ -93,13 +101,17 @@ signInAnonymously(auth);
 
 const appId = "jagadamba-shop";
 
+/* ✅ UPLOAD ITEM */
 window.addItem = async () => {
 const file = imgInp.files[0];
 const name = itemName.value;
 const price = itemPrice.value;
 const cat = itemCat.value;
 
-if(!file||!name||!price){alert("Fill all");return;}
+if(!file||!name||!price){
+alert("Sab bharo");
+return;
+}
 
 const imgRef = ref(storage, `products/${Date.now()}_${file.name}`);
 await uploadBytes(imgRef, file);
@@ -109,18 +121,19 @@ await addDoc(collection(db,"artifacts",appId,"public","data","products"),{
 name,price,category:cat,imageUrl
 });
 
-itemName.value="";itemPrice.value="";imgInp.value="";
+itemName.value="";
+itemPrice.value="";
+imgInp.value="";
 };
 
-const grid = document.getElementById("productGrid");
-
-onSnapshot(collection(db,"artifacts",appId,"public","data","products"), snap=>{
+/* ✅ LOAD PRODUCTS */
+const grid=document.getElementById("productGrid");
+onSnapshot(collection(db,"artifacts",appId,"public","data","products"),snap=>{
 grid.innerHTML="";
 snap.forEach(d=>{
 const p=d.data();
 const div=document.createElement("div");
 div.className="product-card relative";
-
 div.innerHTML=`
 <button class="delete-btn absolute top-2 right-2 bg-red-500 text-white w-8 h-8 rounded-full"
 onclick="deleteItem('${d.id}')">
@@ -135,12 +148,13 @@ grid.appendChild(div);
 });
 });
 
-window.deleteItem = async (id)=>{
-if(confirm("Delete?")){
+/* ✅ DELETE ITEM */
+window.deleteItem = async(id)=>{
+if(confirm("Delete kare?")){
 await deleteDoc(doc(db,"artifacts",appId,"public","data","products",id))
 }
 }
 </script>
 
 </body>
-    </html>
+</html>
