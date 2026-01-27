@@ -5,79 +5,82 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Shree Jagadamba Selection</title>
 
+<!-- Tailwind CSS -->
 <script src="https://cdn.tailwindcss.com"></script>
-<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+<!-- Font Awesome -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"/>
 
 <script>
-let selectedCategory = 'All';
-
-window.openAdminLogin = () => {
-  document.getElementById('loginModal').classList.remove('hidden');
+function openAdminLogin(){
+  document.getElementById("loginModal").classList.remove("hidden");
 }
 
-window.closeAdminLogin = () => {
-  document.getElementById('loginModal').classList.add('hidden');
+function closeAdminLogin(){
+  document.getElementById("loginModal").classList.add("hidden");
 }
 
-window.verifyAdmin = () => {
-  const pass = document.getElementById('adminPassword').value;
+function verifyAdmin(){
+  var pass = document.getElementById("adminPassword").value;
+
   if(pass === "sirvitarun9828"){
-    document.getElementById('adminPanel').classList.remove('hidden');
-    document.body.classList.add('admin-active');
+    document.getElementById("adminPanel").classList.remove("hidden");
     closeAdminLogin();
-    window.scrollTo({top:0, behavior:'smooth'});
+    window.scrollTo({top:0, behavior:"smooth"});
   } else {
     alert("Galat password!");
   }
 }
 
-window.logoutAdmin = () => {
-  document.getElementById('adminPanel').classList.add('hidden');
-  document.body.classList.remove('admin-active');
+function logoutAdmin(){
+  document.getElementById("adminPanel").classList.add("hidden");
 }
-
 </script>
 
-<style>
-body { font-family: Arial, sans-serif; background:#fffaf0; }
-.delete-btn{display:none;}
-body.admin-active .delete-btn{display:block;}
-.modal-overlay{background:rgba(0,0,0,0.7);}
-</style>
 </head>
+<body class="bg-[#fffaf0] text-gray-800">
 
-<body>
-
-<header class="bg-yellow-100 p-6 text-center font-bold text-xl">
-Shree Jagadamba Selection
+<!-- HEADER -->
+<header class="bg-yellow-100 py-6 text-center shadow">
+  <h1 class="text-3xl font-bold">Shree Jagadamba Selection</h1>
+  <p class="text-sm tracking-widest mt-1">Anavatti, Shivamogga</p>
 </header>
 
-<section id="adminPanel" class="hidden p-6 bg-yellow-50 text-center">
-<h2 class="font-bold text-xl mb-4">OWNER PANEL</h2>
-<button onclick="logoutAdmin()" class="bg-red-500 text-white px-4 py-2 rounded">Logout</button>
+<!-- OWNER PANEL -->
+<section id="adminPanel" class="hidden max-w-xl mx-auto mt-8 bg-yellow-50 border border-yellow-300 rounded-xl p-6 text-center">
+  <h2 class="text-xl font-bold mb-4">OWNER PANEL</h2>
+  <p class="mb-4">Welcome Owner 👑</p>
+  <button onclick="logoutAdmin()" class="bg-red-500 text-white px-6 py-2 rounded">Logout</button>
 </section>
 
-<main class="p-10 text-center">
-<h2 class="text-2xl font-bold mb-6">Welcome to our catalogue</h2>
-<p>Physical store only. No online selling.</p>
+<!-- MAIN CONTENT -->
+<main class="text-center py-16 px-4">
+  <h2 class="text-2xl font-bold mb-4">Welcome to our catalogue</h2>
+  <p>This is only a digital display website.  
+  <br>No online orders. Visit our showroom.</p>
 </main>
 
-<footer class="p-10 text-center">
-<button onclick="openAdminLogin()" class="border px-6 py-3 rounded-full">
-<i class="fas fa-lock"></i> Owner Login
-</button>
+<!-- FOOTER -->
+<footer class="text-center py-10">
+  <button onclick="openAdminLogin()" class="border px-8 py-3 rounded-full hover:bg-yellow-100 transition">
+    <i class="fas fa-lock mr-2"></i> Owner Login
+  </button>
 </footer>
 
-<div id="loginModal" class="hidden fixed inset-0 modal-overlay flex items-center justify-center">
-<div class="bg-white p-6 rounded-xl w-80 text-center">
-<h3 class="font-bold mb-4">Owner Login</h3>
-<input type="password" id="adminPassword" placeholder="Password" class="border p-2 w-full mb-4">
-<div class="flex gap-2">
-<button onclick="closeAdminLogin()" class="flex-1 border py-2">Cancel</button>
-<button onclick="verifyAdmin()" class="flex-1 bg-yellow-500 text-white py-2">Login</button>
-</div>
-</div>
+<!-- LOGIN MODAL -->
+<div id="loginModal" class="hidden fixed inset-0 bg-black/70 flex items-center justify-center">
+  <div class="bg-white p-6 rounded-xl w-80 text-center">
+    <h3 class="text-lg font-bold mb-4">Owner Login</h3>
+
+    <input type="password" id="adminPassword" placeholder="Enter Password"
+      class="border w-full p-2 mb-4 text-center rounded">
+
+    <div class="flex gap-2">
+      <button onclick="closeAdminLogin()" class="flex-1 border py-2 rounded">Cancel</button>
+      <button onclick="verifyAdmin()" class="flex-1 bg-yellow-500 text-white py-2 rounded">Login</button>
+    </div>
+  </div>
 </div>
 
 </body>
-</html>
+  </html>
