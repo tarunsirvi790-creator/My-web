@@ -59,11 +59,26 @@
         body.admin-active .delete-btn { display: flex; }
 
         .no-scrollbar::-webkit-scrollbar { display: none; }
+        
+        /* Loading spinner */
+        .loader {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid var(--gold);
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 2s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
     </style>
 </head>
 <body class="overflow-x-hidden">
 
-    <!-- Header Section -->
+    <!-- Header Section (Upar ka hissa) -->
     <header class="hero-gradient shadow-sm">
         <div class="max-w-7xl mx-auto px-6 py-10 flex flex-col items-center text-center">
             <div class="mb-5 p-4 bg-white rounded-full shadow-2xl border border-white/50">
@@ -75,7 +90,7 @@
             <p class="text-[9px] font-bold text-gray-500 uppercase tracking-widest italic text-center text-center">Anavatti, Shivamogga • Karnataka</p>
         </div>
         
-        <!-- Navigation Menu -->
+        <!-- Navigation Menu (Categories) -->
         <nav class="bg-white/95 sticky top-0 z-50 border-b border-gray-100 overflow-x-auto no-scrollbar">
             <div class="max-w-7xl mx-auto flex justify-center space-x-10 py-4 px-8 whitespace-nowrap text-[10px] font-bold uppercase tracking-widest">
                 <a id="cat-All" href="javascript:void(0)" onclick="window.filterCategory('All', this)" class="nav-active py-1">Catalogue</a>
@@ -88,7 +103,7 @@
         </nav>
     </header>
 
-    <!-- Owner Dashboard -->
+    <!-- Owner Dashboard (Admin Control) -->
     <section id="adminPanel" class="hidden max-w-6xl mx-auto mt-8 p-6 bg-white rounded-[2rem] shadow-2xl border border-yellow-100 mx-4 lg:mx-auto">
         <div class="flex justify-between items-center mb-8">
             <h2 class="brand-font text-xl font-bold text-gray-800 uppercase">Control Center</h2>
@@ -99,12 +114,12 @@
         
         <div class="grid grid-cols-1 md:grid-cols-5 gap-3">
             <div class="relative">
-                <input type="file" id="imgInp" class="hidden" accept="image/*" onchange="if(this.files.length) document.getElementById('lTag').innerText='Photo Taiyaar Hai'">
+                <input type="file" id="imgInp" class="hidden" accept="image/*" onchange="if(this.files.length) document.getElementById('lTag').innerText='Photo Ready'">
                 <label for="imgInp" id="lTag" class="flex items-center justify-center border-2 border-dashed border-gray-200 rounded-2xl p-4 cursor-pointer bg-gray-50 h-full text-[9px] font-bold text-gray-400 uppercase text-center shadow-inner">
                     Photo Chunein
                 </label>
             </div>
-            <input type="text" id="itemName" placeholder="Saman ka Naam" class="bg-gray-50 border border-gray-100 p-4 rounded-2xl text-sm outline-none">
+            <input type="text" id="itemName" placeholder="Item Name" class="bg-gray-50 border border-gray-100 p-4 rounded-2xl text-sm outline-none">
             <input type="text" id="itemPrice" placeholder="Keemat (₹)" class="bg-gray-50 border border-gray-100 p-4 rounded-2xl text-sm outline-none">
             <select id="itemCat" class="bg-gray-50 border border-gray-100 p-4 rounded-2xl text-sm font-bold text-gray-600">
                 <option value="Saree">Saree</option>
@@ -119,20 +134,27 @@
         </div>
     </section>
 
-    <!-- Main Grid -->
+    <!-- Main Catalogue Grid -->
     <main class="max-w-7xl mx-auto px-4 py-12">
         <div class="text-center mb-10">
             <h3 class="brand-font text-2xl text-gray-800 font-bold uppercase tracking-wider text-center">Catalogue Selection</h3>
             <p class="text-[9px] text-red-500 font-bold uppercase mt-2 italic text-center underline decoration-red-200">
-                ⚠️ Sirf Showroom Par Milega • <span id="itemCount">0</span> Items Listed
+                ⚠️ Store Visit Only • <span id="itemCount">0</span> Items Listed
             </p>
         </div>
+        
+        <!-- Status Messages -->
+        <div id="statusMessage" class="flex flex-col items-center justify-center py-20 text-gray-400 hidden">
+            <div class="loader mb-4"></div>
+            <p class="text-xs uppercase tracking-widest">Dukaan se data jud raha hai...</p>
+        </div>
+
         <div id="productGrid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-10">
-            <!-- Saman yahan dikhega -->
+            <!-- Items appear here -->
         </div>
     </main>
 
-    <!-- Footer -->
+    <!-- Footer Section -->
     <footer class="bg-white py-16 text-center border-t border-gray-100 mt-10">
         <div class="max-w-4xl mx-auto px-6 text-center">
             <div class="flex items-center justify-center gap-4 text-gray-700 font-bold bg-[#fffaf0] p-5 rounded-[2rem] border border-[#f3e5ab] mb-10 mx-auto w-fit">
@@ -144,44 +166,42 @@
             <p class="text-[9px] text-gray-400 uppercase tracking-[0.4em] mt-2 mb-12 text-center text-center">Anavatti, Shivamogga</p>
             
             <button id="loginBtn" onclick="window.openLogin()" class="group flex items-center gap-3 text-[10px] text-gray-400 hover:text-[#B8860B] border border-gray-100 px-10 py-3 rounded-full transition-all font-bold uppercase tracking-widest mx-auto">
-                <i class="fas fa-lock"></i> Owner Login
+                <i class="fas fa-lock text-[10px]"></i> Owner Login
             </button>
         </div>
     </footer>
 
-    <!-- Modal Login -->
+    <!-- Login Modal -->
     <div id="loginModal" class="hidden fixed inset-0 modal-overlay flex items-center justify-center p-6">
         <div class="bg-white rounded-[2.5rem] p-10 max-w-sm w-full shadow-2xl">
-            <div class="text-center mb-8 text-center">
+            <div class="text-center mb-8">
                 <h2 class="brand-font text-xl font-bold text-gray-800 uppercase text-center">Owner Access</h2>
             </div>
             <input type="password" id="passInput" placeholder="Password" class="w-full p-5 bg-gray-50 border rounded-2xl text-center font-bold tracking-[0.4em] text-xl outline-none mb-6">
             <div class="flex gap-4">
-                <button onclick="window.closeLogin()" class="flex-1 py-3 text-xs font-bold text-gray-400 uppercase">Cancel</button>
-                <button onclick="window.verifyAdmin()" class="flex-[2] py-4 bg-[#B8860B] text-white rounded-2xl text-xs font-black shadow-lg uppercase tracking-widest active:scale-95 transition">Verify</button>
+                <button onclick="window.closeLogin()" class="flex-1 py-3 text-xs font-bold text-gray-400 uppercase text-center">Hatao</button>
+                <button onclick="window.verifyAdmin()" class="flex-[2] py-4 bg-[#B8860B] text-white rounded-2xl text-xs font-black shadow-lg uppercase tracking-widest active:scale-95 transition text-center">Check Karein</button>
             </div>
         </div>
     </div>
 
-    <!-- Firebase Logic with Stability Fix -->
+    <!-- Firebase Scripts -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, collection, onSnapshot, addDoc, deleteDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // Firebase Setup
+        // Global Variables
         const firebaseConfig = JSON.parse(__firebase_config);
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
-        
-        // RULE 1: Correct appId path
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
 
         let selectedCategory = 'All';
-        let currentUser = null;
+        let user = null;
 
-        // GLOBAL FUNCTIONS
+        // --- GLOBAL FUNCTIONS FOR BUTTONS ---
         window.openLogin = () => document.getElementById('loginModal').classList.remove('hidden');
         window.closeLogin = () => { document.getElementById('loginModal').classList.add('hidden'); document.getElementById('passInput').value = ''; };
         window.logout = () => { document.getElementById('adminPanel').classList.add('hidden'); document.body.classList.remove('admin-active'); };
@@ -192,46 +212,60 @@
                 document.body.classList.add('admin-active');
                 window.closeLogin();
                 window.scrollTo({top:0, behavior:'smooth'});
-            } else { alert("Galat Password!"); }
+            } else { 
+                alert("Galat Password!"); 
+            }
         };
 
         window.filterCategory = (cat, el) => {
             selectedCategory = cat;
-            document.querySelectorAll('nav a').forEach(a => a.className = "text-gray-400 hover:text-[#B8860B] py-1 transition");
-            el.className = "nav-active py-1";
-            if(currentUser) loadStock();
+            document.querySelectorAll('nav a').forEach(a => {
+                a.classList.remove('text-[#B8860B]', 'nav-active');
+                a.classList.add('text-gray-400');
+            });
+            el.classList.remove('text-gray-400');
+            el.classList.add('text-[#B8860B]', 'nav-active');
+            if(user) loadStock();
         };
 
-        // RULE 3: Auth Before Queries
-        async function start() {
+        // --- CORE FIREBASE LOGIC ---
+
+        // RULE 3: Auth First
+        async function init() {
             try {
+                document.getElementById('statusMessage').classList.remove('hidden');
                 if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
                     await signInWithCustomToken(auth, __initial_auth_token);
                 } else {
                     await signInAnonymously(auth);
                 }
             } catch (e) {
-                console.error("Auth failed:", e);
+                console.error("Auth Error:", e);
+                document.getElementById('statusMessage').innerHTML = "<p class='text-red-500'>Connection Fail Ho Gaya. Page Refresh Karein.</p>";
             }
         }
 
-        onAuthStateChanged(auth, (user) => {
-            currentUser = user;
+        // Authentication State Listener
+        onAuthStateChanged(auth, (u) => {
+            user = u;
             if (user) {
+                document.getElementById('statusMessage').classList.add('hidden');
                 loadStock();
             }
         });
 
+        // Load Stock Data (RULE 1 & 2)
         function loadStock() {
-            if (!currentUser) return;
-            // RULE 1: Strict path for public data
-            const pRef = collection(db, 'artifacts', appId, 'public', 'data', 'products');
+            if (!user) return;
+            // RULE 1: Correct Path
+            const productRef = collection(db, 'artifacts', appId, 'public', 'data', 'products');
             
-            // RULE 2: No complex queries, filter in JS
-            onSnapshot(pRef, (snap) => {
+            // RULE 2: No complex queries, filter in JS memory
+            onSnapshot(productRef, (snap) => {
                 const grid = document.getElementById('productGrid');
                 grid.innerHTML = '';
                 let count = 0;
+                
                 snap.forEach((doc) => {
                     const data = doc.data();
                     if (selectedCategory === 'All' || data.category === selectedCategory) {
@@ -239,9 +273,18 @@
                         count++;
                     }
                 });
+                
                 document.getElementById('itemCount').innerText = count;
+                
+                if (count === 0) {
+                    grid.innerHTML = '<div class="col-span-full py-10 text-center text-gray-400 text-xs uppercase tracking-widest">Abhi is category mein koi saman nahi hai.</div>';
+                }
             }, (error) => {
                 console.error("Firestore Error:", error);
+                if (error.code === 'permission-denied') {
+                    document.getElementById('statusMessage').classList.remove('hidden');
+                    document.getElementById('statusMessage').innerHTML = "<p class='text-red-500'>Permission Denied. Please Refresh.</p>";
+                }
             });
         }
 
@@ -249,11 +292,67 @@
             const div = document.createElement('div');
             div.className = "product-card overflow-hidden group relative";
             div.innerHTML = `
-                <button onclick="window.deleteItem('${id}')" class="delete-btn absolute top-3 right-3 z-10 bg-red-500 text-white w-9 h-9 rounded-full flex items-center justify-center"><i class="fas fa-trash text-xs"></i></button>
-                <div class="aspect-[3/4] overflow-hidden"><img src="${data.imageUrl}" class="w-full h-full object-cover"></div>
+                <button onclick="window.deleteItem('${id}')" class="delete-btn absolute top-3 right-3 z-10 bg-red-500 text-white w-9 h-9 rounded-full flex items-center justify-center active:scale-95 shadow-lg">
+                    <i class="fas fa-trash-alt text-xs"></i>
+                </button>
+                <div class="aspect-[3/4] overflow-hidden bg-gray-50">
+                    <img src="${data.imageUrl}" class="w-full h-full object-cover transition duration-500 group-hover:scale-105" alt="Clothing">
+                </div>
                 <div class="p-4 text-center">
                     <h4 class="brand-font text-[10px] font-bold uppercase truncate">${data.name}</h4>
                     <p class="text-lg font-bold text-[#B8860B] mt-1">₹${data.price}</p>
                 </div>`;
             return div;
         }
+
+        window.addItem = async () => {
+            if(!user) { alert("Pehle connection ban jane dein..."); return; }
+            
+            const name = document.getElementById('itemName').value;
+            const price = document.getElementById('itemPrice').value;
+            const category = document.getElementById('itemCat').value;
+            const file = document.getElementById('imgInp').files[0];
+            
+            if (!name || !price || !file) { 
+                alert("Sari jankari bhariye (Photo, Naam, aur Keemat)!"); 
+                return; 
+            }
+            
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = async () => {
+                try {
+                    const productRef = collection(db, 'artifacts', appId, 'public', 'data', 'products');
+                    await addDoc(productRef, {
+                        name: name,
+                        price: price,
+                        category: category,
+                        imageUrl: reader.result,
+                        timestamp: serverTimestamp()
+                    });
+                    alert("Stock jod diya gaya hai!");
+                    document.getElementById('itemName').value = '';
+                    document.getElementById('itemPrice').value = '';
+                    document.getElementById('lTag').innerText = "Photo Chunein";
+                } catch (e) {
+                    alert("Galti hui: " + e.message);
+                }
+            };
+        };
+
+        window.deleteItem = async (id) => {
+            if (user && confirm("Kya aap ise catalogue se hatana chahte hain?")) {
+                try {
+                    const dRef = doc(db, 'artifacts', appId, 'public', 'data', 'products', id);
+                    await deleteDoc(dRef);
+                } catch (e) {
+                    alert("Delete nahi ho paya: " + e.message);
+                }
+            }
+        };
+
+        // Start App
+        init();
+    </script>
+</body>
+                    </html>
