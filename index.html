@@ -25,7 +25,6 @@
         .nav-active { color: var(--gold); border-bottom: 3px solid var(--gold); font-weight: 700; }
         .modal-overlay { background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(10px); z-index: 9999; }
         
-        /* Admin Section Styling */
         .admin-only { display: none !important; }
         body.admin-active .admin-only { display: block !important; }
         
@@ -51,7 +50,6 @@
 
     <div id="toast" class="custom-alert bg-gray-900"></div>
 
-    <!-- Header Section -->
     <header class="hero-gradient shadow-sm border-b border-yellow-100">
         <div class="max-w-7xl mx-auto px-6 py-10 flex flex-col items-center text-center">
             <div class="mb-4 p-6 bg-white rounded-full shadow-2xl inline-block border-2 border-yellow-50 relative">
@@ -111,7 +109,6 @@
         </div>
     </section>
 
-    <!-- Main Catalogue Grid -->
     <main class="max-w-7xl mx-auto px-4 py-16">
         <div id="loadingStatus" class="flex flex-col items-center justify-center py-24 text-gray-400 text-center">
             <div class="loader-spin mb-4"></div><p id="loadingMsg" class="text-[11px] uppercase tracking-widest text-gray-600">Connecting to SJS Database...</p>
@@ -123,13 +120,12 @@
         </div>
     </main>
 
-    <!-- Footer Section -->
     <footer class="py-16 text-center border-t border-yellow-50 bg-white">
         <p class="brand-font text-2xl font-bold text-gray-800 mb-6 tracking-tight">Shree Jagadamba Selection</p>
         <button onclick="window.openLogin()" class="text-[11px] text-gray-400 uppercase tracking-[0.2em] font-bold border border-gray-100 px-10 py-4 rounded-full hover:bg-black hover:text-white transition-all shadow-sm">Owner Login</button>
     </footer>
 
-    <!-- Delete Modal -->
+    <!-- Modals -->
     <div id="dModal" class="hidden fixed inset-0 modal-overlay flex items-center justify-center p-6 text-center z-[10001]">
         <div class="bg-white rounded-[2.5rem] p-10 max-w-sm w-full shadow-2xl">
             <h2 class="brand-font text-xl font-bold mb-4 uppercase text-gray-800">Hatao Item?</h2>
@@ -140,7 +136,6 @@
         </div>
     </div>
 
-    <!-- Login Modal -->
     <div id="lModal" class="hidden fixed inset-0 modal-overlay flex items-center justify-center p-6 text-center">
         <div class="bg-white rounded-[3rem] p-12 max-w-sm w-full shadow-2xl relative">
             <button onclick="window.closeLogin()" class="absolute top-6 right-8 text-gray-300 hover:text-gray-800"><i class="fas fa-times"></i></button>
@@ -150,7 +145,6 @@
         </div>
     </div>
 
-    <!-- Image Viewer Modal -->
     <div id="vModal" class="hidden fixed inset-0 modal-overlay flex flex-col items-center justify-center p-4 z-[9999]" onclick="window.closeFullImage()">
         <img id="lImg" src="" class="rounded-3xl shadow-2xl mb-6 max-h-[85vh] w-auto object-contain border-4 border-white/10" onclick="event.stopPropagation()">
         <p id="lName" class="text-white font-bold uppercase tracking-[0.2em] text-lg bg-black/30 px-6 py-2 rounded-full backdrop-blur-sm"></p>
@@ -158,10 +152,10 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, collection, onSnapshot, addDoc, deleteDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // Global constants for easy access
+        // Correct Firebase Configuration
         const firebaseConfig = {
             apiKey: "AIzaSyBLLLFfbzRzB4oE-LT4QxbUmukO6SVRJ4I",
             authDomain: "my-side-11eef.firebaseapp.com",
@@ -179,7 +173,7 @@
         let currentUser = null;
         window.activeCat = 'All';
 
-        // Register Global Functions Immediately
+        // Fix: Assign functions to window immediately
         window.openLogin = () => { 
             document.getElementById('lModal').classList.remove('hidden'); 
             setTimeout(() => document.getElementById('pInput').focus(), 100); 
@@ -197,8 +191,10 @@
         };
         window.closeDeleteModal = () => document.getElementById('dModal').classList.add('hidden');
         window.openFullImage = (url, name) => { 
-            document.getElementById('lImg').src = url; 
-            document.getElementById('lName').innerText = name; 
+            const imgEl = document.getElementById('lImg');
+            if(imgEl) imgEl.src = url; 
+            const nameEl = document.getElementById('lName');
+            if(nameEl) nameEl.innerText = name; 
             document.getElementById('vModal').classList.remove('hidden'); 
             document.body.style.overflow = 'hidden'; 
         };
@@ -210,19 +206,17 @@
         const showToast = (msg, isError = false) => {
             const t = document.getElementById('toast');
             if(!t) return;
-            t.innerText = msg; 
-            t.style.backgroundColor = isError ? '#ef4444' : '#111827';
-            t.classList.add('show'); 
-            setTimeout(() => t.classList.remove('show'), 4000);
+            t.innerText = msg; t.style.backgroundColor = isError ? '#ef4444' : '#111827';
+            t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 4000);
         };
 
-        // Authentication Initialization
         const initAuth = async () => {
             try {
                 await signInAnonymously(auth);
             } catch (error) {
                 console.error("Auth error:", error);
-                document.getElementById('loadingMsg').innerText = "Auth Lock. Please refresh.";
+                document.getElementById('loadingMsg').innerText = "Auth Lock. Please check API Key Settings.";
+                showToast("Firebase API Key Error", true);
             }
         };
 
@@ -267,6 +261,9 @@
                     }
                 });
                 document.getElementById('noData').classList.toggle('hidden', hasItems);
+            }, (err) => {
+                console.error("Data error:", err);
+                showToast("Database Permission Denied", true);
             });
         }
 
@@ -276,19 +273,25 @@
             const price = document.getElementById('itemPrice').value.trim();
             const cat = document.getElementById('itemCat').value;
             const fileInput = document.getElementById('imgInp');
+            
             if (!name || !price || !fileInput.files[0]) return showToast("Puri jaankari bhariye!", true);
+            
             const btn = document.getElementById('uploadBtn');
             btn.disabled = true; btn.innerText = "Processing...";
+            
             try {
                 const formData = new FormData();
                 formData.append('file', fileInput.files[0]);
                 formData.append('upload_preset', 'my_upload'); 
                 const clRes = await fetch('https://api.cloudinary.com/v1_1/dkxmgxkgb/image/upload', { method: 'POST', body: formData });
                 const clData = await clRes.json();
-                if (!clData.secure_url) throw new Error("Cloudinary Error");
+                
+                if (!clData.secure_url) throw new Error("Upload Error");
+
                 await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'products'), { 
                     n: name, p: price, cat: cat, img: clData.secure_url, timestamp: serverTimestamp() 
                 });
+                
                 showToast("Dukaan Update Ho Gayi! ✅");
                 document.getElementById('itemName').value = '';
                 document.getElementById('itemPrice').value = '';
