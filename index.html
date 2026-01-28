@@ -122,7 +122,8 @@
 
     <footer class="py-16 text-center border-t border-yellow-50 bg-white">
         <p class="brand-font text-2xl font-bold text-gray-800 mb-6 tracking-tight">Shree Jagadamba Selection</p>
-       <button onclick="window.openLogin()" class="text-[11px] text-gray-400 uppercase tracking-[0.2em] font-bold border border-gray-100 px-10 py-4 rounded-full hover:bg-black hover:text-white transition-all shadow-sm">Owner Login</button>
+        <button onclick="window.openLogin()" class="text-[11px] text-gray-400 uppercase tracking-[0.2em] font-bold border border-gray-100 px-10 py-4 rounded-full hover:bg-black hover:text-white transition-all shadow-sm">Owner Login</button>
+    </footer>
 
     <!-- Modals -->
     <div id="dModal" class="hidden fixed inset-0 modal-overlay flex items-center justify-center p-6 text-center z-[10001]">
@@ -150,99 +151,134 @@
     </div>
 
     <script type="module">
-          import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        // Import the functions you need from the SDKs you need
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-analytics.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, collection, onSnapshot, addDoc, deleteDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
- // Import the functions you need from the SDKs you need
-import { initializeApp } from "firebase/app";
-import { getAnalytics } from "firebase/analytics";
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
 
-// Your web app's Firebase configuration
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
-const firebaseConfig = {
-  apiKey: "AIzaSyBLlLFFbzRzB4oE-LT4QxbUmukO6SVRJ4I",
-  authDomain: "my-side-11eef.firebaseapp.com",
-  projectId: "my-side-11eef",
-  storageBucket: "my-side-11eef.firebasestorage.app",
-  messagingSenderId: "85450849605",
-  appId: "1:85450849605:web:870172cbece91b6960922c",
-  measurementId: "G-N2H0VT2XXJ"
-};
-const appId = typeof __app_id !== 'undefined' ? __app_id : 'shree-jagadamba-v21';
-let currentUser = null;
+        // Your web app's Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyBLlLFFbzRzB4oE-LT4QxbUmukO6SVRJ4I",
+            authDomain: "my-side-11eef.firebaseapp.com",
+            projectId: "my-side-11eef",
+            storageBucket: "my-side-11eef.firebasestorage.app",
+            messagingSenderId: "85450849605",
+            appId: "1:85450849605:web:870172cbece91b6960922c",
+            measurementId: "G-N2H0VT2XXJ"
+        };
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'shree-jagadamba-v21';
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const analytics = getAnalytics(app);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        let currentUser = null;
         window.activeCat = 'All';
 
-        // Register Global Functions Immediately so they are available in the HTML
-        window.openLogin = () => { 
-            const lModal = document.getElementById('lModal');
-            if(lModal) lModal.classList.remove('hidden'); 
-            const pinInp = document.getElementById('pInput');
-            if(pinInp) setTimeout(() => pinInp.focus(), 100); 
-        };
-        
-        window.closeLogin = () => { 
-            const lModal = document.getElementById('lModal');
-            if(lModal) lModal.classList.add('hidden'); 
-            const pinInp = document.getElementById('pInput');
-            if(pinInp) pinInp.value = ''; 
-        };
-        
-        window.logoutManual = () => { 
-            localStorage.removeItem('sjs_v21_active'); 
-            window.location.reload(); 
-        };
-        
-        window.handleFileSelect = (el) => { 
-            if(el.files && el.files.length) {
-                const tag = document.getElementById('lTag');
-                if(tag) tag.innerHTML = `<i class="fas fa-check-circle text-2xl text-green-500 mb-2"></i><span class="text-green-600 font-bold">Photo Ready ✅</span>`; 
-            }
-        };
-        
-        window.closeDeleteModal = () => {
-            const dModal = document.getElementById('dModal');
-            if(dModal) dModal.classList.add('hidden');
-        };
-        
-        window.openFullImage = (url, name) => { 
-            const imgEl = document.getElementById('lImg');
-            const nameEl = document.getElementById('lName');
-            const vModal = document.getElementById('vModal');
-            if(imgEl) imgEl.src = url; 
-            if(nameEl) nameEl.innerText = name; 
-            if(vModal) vModal.classList.remove('hidden'); 
-            document.body.style.overflow = 'hidden'; 
-        };
-        
-        window.closeFullImage = () => { 
-            const vModal = document.getElementById('vModal');
-            if(vModal) vModal.classList.add('hidden'); 
-            document.body.style.overflow = 'auto'; 
-        };
-
+        // toast helper
         const showToast = (msg, isError = false) => {
             const t = document.getElementById('toast');
             if(!t) return;
-            t.innerText = msg; t.style.backgroundColor = isError ? '#ef4444' : '#111827';
-            t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 4000);
+            t.innerText = msg;
+            t.style.backgroundColor = isError ? '#ef4444' : '#111827';
+            t.classList.add('show');
+            setTimeout(() => t.classList.remove('show'), 4000);
         };
 
+        // Window exposed functions - Registered properly as global functions
+        window.openLogin = function() {
+            const modal = document.getElementById('lModal');
+            if(modal) modal.classList.remove('hidden');
+            setTimeout(() => {
+                const inp = document.getElementById('pInput');
+                if(inp) inp.focus();
+            }, 100);
+        };
+
+        window.closeLogin = function() {
+            const modal = document.getElementById('lModal');
+            if(modal) modal.classList.add('hidden');
+            const inp = document.getElementById('pInput');
+            if(inp) inp.value = '';
+        };
+
+        window.logoutManual = function() {
+            localStorage.removeItem('sjs_v21_active');
+            window.location.reload();
+        };
+
+        window.handleFileSelect = function(el) {
+            if(el.files && el.files.length) {
+                const tag = document.getElementById('lTag');
+                if(tag) tag.innerHTML = `<i class="fas fa-check-circle text-2xl text-green-500 mb-2"></i><span class="text-green-600 font-bold">Photo Ready ✅</span>`;
+            }
+        };
+
+        window.closeDeleteModal = function() {
+            const modal = document.getElementById('dModal');
+            if(modal) modal.classList.add('hidden');
+        };
+
+        window.openFullImage = function(url, name) {
+            const img = document.getElementById('lImg');
+            const nm = document.getElementById('lName');
+            const modal = document.getElementById('vModal');
+            if(img) img.src = url;
+            if(nm) nm.innerText = name;
+            if(modal) modal.classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        };
+
+        window.closeFullImage = function() {
+            const modal = document.getElementById('vModal');
+            if(modal) modal.classList.add('hidden');
+            document.body.style.overflow = 'auto';
+        };
+
+        window.verifyAdmin = function() {
+            const inp = document.getElementById('pInput');
+            if(!inp) return;
+            const enteredPin = inp.value.trim().toLowerCase();
+            if (enteredPin === "sirvitarun9828") {
+                localStorage.setItem('sjs_v21_active', '1');
+                window.closeLogin();
+                document.body.classList.add('admin-active');
+                showToast("Namaste Owner! ✅");
+            } else {
+                showToast("Galt Pin Hai!", true);
+            }
+        };
+
+        window.filterCategory = function(cat, el) {
+            window.activeCat = cat;
+            document.querySelectorAll('nav a').forEach(a => {
+                a.classList.remove('nav-active');
+                a.classList.add('text-gray-400');
+            });
+            el.classList.add('nav-active');
+            el.classList.remove('text-gray-400');
+            loadData();
+        };
+
+        // Firebase Logic
         const initAuth = async () => {
             try {
                 await signInAnonymously(auth);
             } catch (error) {
                 console.error("Auth error:", error);
-                const lMsg = document.getElementById('loadingMsg');
-                if(lMsg) lMsg.innerText = "Auth Lock. Please check Connection.";
+                const msg = document.getElementById('loadingMsg');
+                if(msg) msg.innerText = "Auth Lock. Check Firebase API Key Settings.";
             }
         };
 
         onAuthStateChanged(auth, (user) => {
             currentUser = user;
             if (user) {
-                const lStatus = document.getElementById('loadingStatus');
-                if(lStatus) lStatus.classList.add('hidden');
+                const loader = document.getElementById('loadingStatus');
+                if(loader) loader.classList.add('hidden');
                 loadData();
             }
         });
@@ -256,11 +292,11 @@ let currentUser = null;
                 const grid = document.getElementById('pGrid');
                 if(!grid) return;
                 grid.innerHTML = '';
-                let hasItemsFound = false;
+                let hasItems = false;
                 snap.forEach((docSnap) => {
                     const item = docSnap.data();
                     if (window.activeCat === 'All' || item.cat === window.activeCat) {
-                        hasItemsFound = true;
+                        hasItems = true;
                         const card = document.createElement('div');
                         card.className = "product-card animate-fade-in";
                         card.innerHTML = `
@@ -283,14 +319,12 @@ let currentUser = null;
                         grid.appendChild(card);
                     }
                 });
-                const noData = document.getElementById('noData');
-                if(noData) noData.classList.toggle('hidden', hasItemsFound);
-            }, (err) => {
-                console.error("Firestore Listen Error:", err);
+                const nd = document.getElementById('noData');
+                if(nd) nd.classList.toggle('hidden', hasItems);
             });
         }
 
-        window.addItem = async () => {
+        window.addItem = async function() {
             if (!currentUser) return showToast("Authenticating...", true);
             const name = document.getElementById('itemName').value.trim();
             const price = document.getElementById('itemPrice').value.trim();
@@ -300,7 +334,7 @@ let currentUser = null;
             if (!name || !price || !fileInput.files[0]) return showToast("Puri jaankari bhariye!", true);
             
             const btn = document.getElementById('uploadBtn');
-            btn.disabled = true; 
+            btn.disabled = true;
             btn.innerText = "Processing...";
             
             try {
@@ -328,47 +362,28 @@ let currentUser = null;
                 if(tag) tag.innerHTML = `<i class="fas fa-camera text-3xl mb-2 text-yellow-600"></i><span>Photo Chuno</span>`;
             } catch (e) { 
                 console.error("Upload error:", e);
-                showToast("Upload Failed. Check Cloudinary Preset (Unsigned).", true); 
+                showToast("Upload Failed. Cloudinary preset 'Unsigned' hona chahiye.", true); 
             } finally { 
-                btn.disabled = false; 
+                btn.disabled = false;
                 btn.innerText = "Upload Karein"; 
             }
         };
 
-        window.deleteItem = (id) => {
-            const dModal = document.getElementById('dModal');
-            if(dModal) dModal.classList.remove('hidden');
-            const cBtn = document.getElementById('confirmDeleteBtn');
-            if(cBtn) {
-                cBtn.onclick = async () => {
+        window.deleteItem = function(id) {
+            const modal = document.getElementById('dModal');
+            if(modal) modal.classList.remove('hidden');
+            const btn = document.getElementById('confirmDeleteBtn');
+            if(btn) {
+                btn.onclick = async () => {
                     try {
                         await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'products', id));
-                        showToast("Design Hata Diya Gaya! 🗑️"); 
+                        showToast("Design Hata Diya Gaya! 🗑️");
                         window.closeDeleteModal();
-                    } catch (e) { 
-                        showToast("Error deleting", true); 
+                    } catch (e) {
+                        showToast("Error deleting", true);
                     }
                 };
             }
-        };
-
-        window.filterCategory = (cat, el) => {
-            window.activeCat = cat;
-            document.querySelectorAll('nav a').forEach(a => { a.classList.remove('nav-active'); a.classList.add('text-gray-400'); });
-            el.classList.add('nav-active'); el.classList.remove('text-gray-400');
-            loadData();
-        };
-
-        window.verifyAdmin = () => {
-            const pinInp = document.getElementById('pInput');
-            if(!pinInp) return;
-            const enteredPin = pinInp.value.trim().toLowerCase(); 
-            if (enteredPin === "sirvitarun9828") {
-                localStorage.setItem('sjs_v21_active', '1');
-                window.closeLogin(); 
-                document.body.classList.add('admin-active');
-                showToast("Namaste Owner! ✅");
-            } else { showToast("Galt Pin Hai!", true); }
         };
 
         if (localStorage.getItem('sjs_v21_active') === '1') {
