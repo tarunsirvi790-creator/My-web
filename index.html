@@ -165,12 +165,7 @@
             measurementId: "G-N2H0VT2XXJ"
         };
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'shree-jagadamba-v21';
-
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
-
-        let currentUser = null;
+   let currentUser = null;
         window.activeCat = 'All';
 
         // Register Global Functions Immediately so they are available in the HTML
