@@ -152,27 +152,19 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, collection, onSnapshot, addDoc, deleteDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-       // Import the functions you need from the SDKs you need
-import { initializeApp } from "firebase/app";
-import { getAnalytics } from "firebase/analytics";
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
-
-// Your web app's Firebase configuration
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
-const firebaseConfig = {
-  apiKey: "AIzaSyBLlLFFbzRzB4oE-LT4QxbUmukO6SVRJ4I",
-  authDomain: "my-side-11eef.firebaseapp.com",
-  projectId: "my-side-11eef",
-  storageBucket: "my-side-11eef.firebasestorage.app",
-  messagingSenderId: "85450849605",
-  appId: "1:85450849605:web:870172cbece91b6960922c",
-  measurementId: "G-N2H0VT2XXJ"
-};
-const appId = typeof __app_id !== 'undefined' ? __app_id : 'shree-jagadamba-v21';
+        const firebaseConfig = {
+            apiKey: "AIzaSyBLLLFfbzRzB4oE-LT4QxbUmukO6SVRJ4I",
+            authDomain: "my-side-11eef.firebaseapp.com",
+            projectId: "my-side-11eef",
+            storageBucket: "my-side-11eef.firebasestorage.app",
+            messagingSenderId: "85450849605",
+            appId: "1:85450849605:web:870172cbece91b6960922c",
+            measurementId: "G-N2H0VT2XXJ"
+        };
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'shree-jagadamba-v21';
 
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
@@ -181,63 +173,76 @@ const appId = typeof __app_id !== 'undefined' ? __app_id : 'shree-jagadamba-v21'
         let currentUser = null;
         window.activeCat = 'All';
 
-        // Register Global Functions Early
+        // Register Global Functions Immediately so they are available in the HTML
         window.openLogin = () => { 
-            document.getElementById('lModal').classList.remove('hidden'); 
-            setTimeout(() => document.getElementById('pInput').focus(), 100); 
+            const lModal = document.getElementById('lModal');
+            if(lModal) lModal.classList.remove('hidden'); 
+            const pinInp = document.getElementById('pInput');
+            if(pinInp) setTimeout(() => pinInp.focus(), 100); 
         };
+        
         window.closeLogin = () => { 
-            document.getElementById('lModal').classList.add('hidden'); 
-            document.getElementById('pInput').value = ''; 
+            const lModal = document.getElementById('lModal');
+            if(lModal) lModal.classList.add('hidden'); 
+            const pinInp = document.getElementById('pInput');
+            if(pinInp) pinInp.value = ''; 
         };
+        
         window.logoutManual = () => { 
             localStorage.removeItem('sjs_v21_active'); 
-            location.reload(); 
+            window.location.reload(); 
         };
+        
         window.handleFileSelect = (el) => { 
-            if(el.files.length) document.getElementById('lTag').innerHTML = `<i class="fas fa-check-circle text-2xl text-green-500 mb-2"></i><span class="text-green-600 font-bold">Photo Ready ✅</span>`; 
+            if(el.files && el.files.length) {
+                const tag = document.getElementById('lTag');
+                if(tag) tag.innerHTML = `<i class="fas fa-check-circle text-2xl text-green-500 mb-2"></i><span class="text-green-600 font-bold">Photo Ready ✅</span>`; 
+            }
         };
-        window.closeDeleteModal = () => document.getElementById('dModal').classList.add('hidden');
+        
+        window.closeDeleteModal = () => {
+            const dModal = document.getElementById('dModal');
+            if(dModal) dModal.classList.add('hidden');
+        };
+        
         window.openFullImage = (url, name) => { 
             const imgEl = document.getElementById('lImg');
             const nameEl = document.getElementById('lName');
+            const vModal = document.getElementById('vModal');
             if(imgEl) imgEl.src = url; 
             if(nameEl) nameEl.innerText = name; 
-            document.getElementById('vModal').classList.remove('hidden'); 
+            if(vModal) vModal.classList.remove('hidden'); 
             document.body.style.overflow = 'hidden'; 
         };
+        
         window.closeFullImage = () => { 
-            document.getElementById('vModal').classList.add('hidden'); 
+            const vModal = document.getElementById('vModal');
+            if(vModal) vModal.classList.add('hidden'); 
             document.body.style.overflow = 'auto'; 
         };
 
         const showToast = (msg, isError = false) => {
             const t = document.getElementById('toast');
             if(!t) return;
-            t.innerText = msg; 
-            t.style.backgroundColor = isError ? '#ef4444' : '#111827';
-            t.classList.add('show'); 
-            setTimeout(() => t.classList.remove('show'), 4000);
+            t.innerText = msg; t.style.backgroundColor = isError ? '#ef4444' : '#111827';
+            t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 4000);
         };
 
         const initAuth = async () => {
             try {
-                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                    await signInWithCustomToken(auth, __initial_auth_token);
-                } else {
-                    await signInAnonymously(auth);
-                }
+                await signInAnonymously(auth);
             } catch (error) {
                 console.error("Auth error:", error);
-                document.getElementById('loadingMsg').innerText = "Auth Lock. Please check API Key Settings.";
-                showToast("Firebase Config Error", true);
+                const lMsg = document.getElementById('loadingMsg');
+                if(lMsg) lMsg.innerText = "Auth Lock. Please check Connection.";
             }
         };
 
         onAuthStateChanged(auth, (user) => {
             currentUser = user;
             if (user) {
-                document.getElementById('loadingStatus').classList.add('hidden');
+                const lStatus = document.getElementById('loadingStatus');
+                if(lStatus) lStatus.classList.add('hidden');
                 loadData();
             }
         });
@@ -249,12 +254,13 @@ const appId = typeof __app_id !== 'undefined' ? __app_id : 'shree-jagadamba-v21'
             const pRef = collection(db, 'artifacts', appId, 'public', 'data', 'products');
             onSnapshot(pRef, (snap) => {
                 const grid = document.getElementById('pGrid');
+                if(!grid) return;
                 grid.innerHTML = '';
-                let hasItems = false;
+                let hasItemsFound = false;
                 snap.forEach((docSnap) => {
                     const item = docSnap.data();
                     if (window.activeCat === 'All' || item.cat === window.activeCat) {
-                        hasItems = true;
+                        hasItemsFound = true;
                         const card = document.createElement('div');
                         card.className = "product-card animate-fade-in";
                         card.innerHTML = `
@@ -267,17 +273,20 @@ const appId = typeof __app_id !== 'undefined' ? __app_id : 'shree-jagadamba-v21'
                                 <p class="text-lg font-black text-[#B8860B] mt-1 tracking-tight">₹${Number(item.p).toLocaleString()}</p>
                             </div>`;
                         card.onclick = () => window.openFullImage(item.img, item.n);
-                        card.querySelector('.delete-btn').onclick = (e) => {
-                            e.stopPropagation();
-                            window.deleteItem(docSnap.id);
-                        };
+                        const dBtn = card.querySelector('.delete-btn');
+                        if(dBtn) {
+                            dBtn.onclick = (e) => {
+                                e.stopPropagation();
+                                window.deleteItem(docSnap.id);
+                            };
+                        }
                         grid.appendChild(card);
                     }
                 });
-                document.getElementById('noData').classList.toggle('hidden', hasItems);
+                const noData = document.getElementById('noData');
+                if(noData) noData.classList.toggle('hidden', hasItemsFound);
             }, (err) => {
                 console.error("Firestore Listen Error:", err);
-                showToast("Database Permission Denied", true);
             });
         }
 
@@ -297,7 +306,7 @@ const appId = typeof __app_id !== 'undefined' ? __app_id : 'shree-jagadamba-v21'
             try {
                 const formData = new FormData();
                 formData.append('file', fileInput.files[0]);
-                formData.append('upload_preset', 'my_upload'); 
+                formData.append('upload_preset', 'ml_default'); 
                 const clRes = await fetch('https://api.cloudinary.com/v1_1/dkxmgxkgb/image/upload', { method: 'POST', body: formData });
                 const clData = await clRes.json();
                 
@@ -315,10 +324,11 @@ const appId = typeof __app_id !== 'undefined' ? __app_id : 'shree-jagadamba-v21'
                 document.getElementById('itemName').value = '';
                 document.getElementById('itemPrice').value = '';
                 fileInput.value = '';
-                document.getElementById('lTag').innerHTML = `<i class="fas fa-camera text-3xl mb-2 text-yellow-600"></i><span>Photo Chuno</span>`;
+                const tag = document.getElementById('lTag');
+                if(tag) tag.innerHTML = `<i class="fas fa-camera text-3xl mb-2 text-yellow-600"></i><span>Photo Chuno</span>`;
             } catch (e) { 
                 console.error("Upload error:", e);
-                showToast("Upload Failed", true); 
+                showToast("Upload Failed. Check Cloudinary Preset (Unsigned).", true); 
             } finally { 
                 btn.disabled = false; 
                 btn.innerText = "Upload Karein"; 
@@ -326,17 +336,20 @@ const appId = typeof __app_id !== 'undefined' ? __app_id : 'shree-jagadamba-v21'
         };
 
         window.deleteItem = (id) => {
-            document.getElementById('dModal').classList.remove('hidden');
-            document.getElementById('confirmDeleteBtn').onclick = async () => {
-                try {
-                    await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'products', id));
-                    showToast("Design Hata Diya Gaya! 🗑️"); 
-                    window.closeDeleteModal();
-                } catch (e) { 
-                    console.error("Delete error:", e);
-                    showToast("Error deleting", true); 
-                }
-            };
+            const dModal = document.getElementById('dModal');
+            if(dModal) dModal.classList.remove('hidden');
+            const cBtn = document.getElementById('confirmDeleteBtn');
+            if(cBtn) {
+                cBtn.onclick = async () => {
+                    try {
+                        await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'products', id));
+                        showToast("Design Hata Diya Gaya! 🗑️"); 
+                        window.closeDeleteModal();
+                    } catch (e) { 
+                        showToast("Error deleting", true); 
+                    }
+                };
+            }
         };
 
         window.filterCategory = (cat, el) => {
@@ -347,7 +360,9 @@ const appId = typeof __app_id !== 'undefined' ? __app_id : 'shree-jagadamba-v21'
         };
 
         window.verifyAdmin = () => {
-            const enteredPin = document.getElementById('pInput').value.trim().toLowerCase(); 
+            const pinInp = document.getElementById('pInput');
+            if(!pinInp) return;
+            const enteredPin = pinInp.value.trim().toLowerCase(); 
             if (enteredPin === "sirvitarun9828") {
                 localStorage.setItem('sjs_v21_active', '1');
                 window.closeLogin(); 
