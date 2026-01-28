@@ -173,7 +173,8 @@ const firebaseConfig = {
 };
  const appId = typeof __app_id !== 'undefined' ? __app_id : 'shree-jagadamba-v21';
   // Initialize Firebase
-      const auth = getAuth(app);
+      const analytics = getAnalytics(app)
+        const auth = getAuth(app);
         const db = getFirestore(app);
 
         let currentUser = null;
