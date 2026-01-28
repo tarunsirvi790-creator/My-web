@@ -158,20 +158,26 @@
         import { getFirestore, doc, collection, onSnapshot, addDoc, deleteDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         // Your web app's Firebase configuration
-        const firebaseConfig = {
-            apiKey: "AIzaSyBLlLFFbzRzB4oE-LT4QxbUmukO6SVRJ4I",
-            authDomain: "my-side-11eef.firebaseapp.com",
-            projectId: "my-side-11eef",
-            storageBucket: "my-side-11eef.firebasestorage.app",
-            messagingSenderId: "85450849605",
-            appId: "1:85450849605:web:870172cbece91b6960922c",
-            measurementId: "G-N2H0VT2XXJ"
-        };
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'shree-jagadamba-v21';
+        // Import the functions you need from the SDKs you need
+import { initializeApp } from "firebase/app";
+import { getAnalytics } from "firebase/analytics";
+// TODO: Add SDKs for Firebase products that you want to use
+// https://firebase.google.com/docs/web/setup#available-libraries
 
-        // Initialize Firebase
-        const app = initializeApp(firebaseConfig);
-        const analytics = getAnalytics(app);
+// Your web app's Firebase configuration
+// For Firebase JS SDK v7.20.0 and later, measurementId is optional
+const firebaseConfig = {
+  apiKey: "AIzaSyBLlLFFbzRzB4oE-LT4QxbUmukO6SVRJ4I",
+  authDomain: "my-side-11eef.firebaseapp.com",
+  projectId: "my-side-11eef",
+  storageBucket: "my-side-11eef.firebasestorage.app",
+  messagingSenderId: "85450849605",
+  appId: "1:85450849605:web:870172cbece91b6960922c",
+  measurementId: "G-N2H0VT2XXJ"
+};
+ const appId = typeof __app_id !== 'undefined' ? __app_id : 'shree-jagadamba-v21';
+  // Initialize Firebase
+    const analytics = getAnalytics(app);
         const auth = getAuth(app);
         const db = getFirestore(app);
 
