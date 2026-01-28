@@ -41,7 +41,9 @@
             background: #ef4444; color: white; width: 36px; height: 36px; 
             border-radius: 50%; align-items: center; justify-content: center; 
             box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4); 
+            transition: 0.2s;
         }
+        .delete-btn:hover { transform: scale(1.1); background: #dc2626; }
         body.admin-active .delete-btn { display: flex !important; }
 
         .loader-spin { border: 3px solid #f3f3f3; border-top: 3px solid var(--gold); border-radius: 50%; width: 28px; height: 28px; animation: spin 1s linear infinite; }
@@ -55,7 +57,7 @@
 </head>
 <body class="overflow-x-hidden">
 
-    <div id="toast" class="custom-alert bg-gray-900"></div>
+    <div id="toast" class="custom-alert bg-gray-800"></div>
 
     <!-- Header Section -->
     <header class="hero-gradient shadow-sm border-b border-yellow-100">
@@ -117,7 +119,7 @@
         <div class="grid grid-cols-1 md:grid-cols-12 gap-4 mb-8">
             <div class="md:col-span-3">
                 <input type="file" id="imgInp" class="hidden" accept="image/*" onchange="window.handleFileSelect(this)">
-                <label for="imgInp" id="lTag" class="flex flex-col items-center justify-center border-2 border-dashed border-gray-200 rounded-2xl p-6 cursor-pointer bg-gray-50 text-[10px] font-bold text-gray-400 uppercase text-center shadow-inner hover:bg-yellow-50 hover:border-yellow-200 transition-all h-full">
+                <label for="imgInp" id="lTag" class="flex flex-col items-center justify-center border-2 border-dashed border-gray-200 rounded-2xl p-6 cursor-pointer bg-gray-50 text-[10px] font-bold text-gray-400 uppercase text-center shadow-inner hover:bg-yellow-50 hover:border-yellow-200 transition-all h-full min-h-[100px]">
                     <i class="fas fa-cloud-upload-alt text-3xl mb-2 text-yellow-600"></i>
                     <span>Select High-Res Photo</span>
                 </label>
@@ -144,12 +146,9 @@
         </div>
 
         <div class="flex flex-wrap justify-center gap-4 border-t border-gray-50 pt-6">
-            <!-- View Store Button -->
             <button onclick="window.scrollTo({top: document.getElementById('pGrid').offsetTop - 150, behavior: 'smooth'})" class="text-[#B8860B] font-bold text-[10px] uppercase tracking-[0.2em] flex items-center gap-2 hover:bg-yellow-50 px-6 py-3 rounded-full border border-yellow-100 transition-all">
                 <i class="fas fa-eye"></i> View Live Store
             </button>
-            
-            <!-- Logout Button -->
             <button onclick="window.logoutManual()" class="text-red-500 font-bold text-[10px] uppercase tracking-[0.2em] flex items-center gap-2 hover:bg-red-50 px-6 py-3 rounded-full border border-red-50 transition-all">
                 <i class="fas fa-sign-out-alt"></i> Secure Logout
             </button>
@@ -160,7 +159,7 @@
     <main class="max-w-7xl mx-auto px-4 py-16">
         <div id="loadingStatus" class="flex flex-col items-center justify-center py-24 text-gray-400 text-center">
             <div class="loader-spin mb-4"></div>
-            <p id="loadingMsg" class="text-[11px] uppercase tracking-[0.3em] font-medium">Fetching Collection from Shree Jagadamba...</p>
+            <p id="loadingMsg" class="text-[11px] uppercase tracking-[0.3em] font-medium text-gray-600">Dukaan se data jud raha hai...</p>
         </div>
         
         <div class="flex flex-col items-center mb-12">
@@ -171,13 +170,11 @@
              </p>
         </div>
 
-        <div id="pGrid" class="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-10">
-            <!-- Products will appear here -->
-        </div>
+        <div id="pGrid" class="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-10"></div>
         
         <div id="noData" class="hidden flex flex-col items-center justify-center py-20 text-gray-300">
             <i class="fas fa-search text-5xl mb-4"></i>
-            <p class="text-xs uppercase font-bold tracking-widest">No items found in this category</p>
+            <p class="text-xs uppercase font-bold tracking-widest">Abhi koi stock nahi hai</p>
         </div>
     </main>
 
@@ -194,25 +191,28 @@
     <div id="lModal" class="hidden fixed inset-0 modal-overlay flex items-center justify-center p-6 text-center">
         <div class="bg-white rounded-[3rem] p-12 max-w-sm w-full shadow-2xl relative">
             <button onclick="window.closeLogin()" class="absolute top-6 right-8 text-gray-300 hover:text-gray-800"><i class="fas fa-times"></i></button>
-            <div class="w-16 h-16 bg-yellow-50 rounded-2xl flex items-center justify-center text-[#B8860B] mx-auto mb-6 shadow-inner">
-                <i class="fas fa-shield-alt text-2xl"></i>
-            </div>
-            <h2 class="brand-font text-2xl font-bold mb-2 uppercase text-gray-800">Admin Login</h2>
-            <p class="text-[10px] text-gray-400 uppercase tracking-widest mb-8">Access Store Management</p>
-            <input type="password" id="pInput" placeholder="Enter Pin" class="w-full p-5 bg-gray-50 border border-gray-100 rounded-2xl text-center font-bold tracking-[0.6em] text-2xl outline-none mb-8 focus:ring-2 focus:ring-yellow-500">
+            <h2 class="brand-font text-2xl font-bold mb-8 uppercase text-gray-800">Admin Access</h2>
+            <input type="password" id="pInput" placeholder="Enter Pin" class="w-full p-5 bg-gray-50 border border-gray-100 rounded-2xl text-center font-bold tracking-[0.6em] text-2xl outline-none mb-8">
+            <button onclick="window.verifyAdmin()" class="w-full py-5 bg-[#B8860B] text-white rounded-2xl text-xs font-bold uppercase tracking-widest shadow-xl">Verify Access</button>
+        </div>
+    </div>
+
+    <div id="dModal" class="hidden fixed inset-0 modal-overlay flex items-center justify-center p-6 text-center z-[10001]">
+        <div class="bg-white rounded-[2.5rem] p-10 max-w-sm w-full shadow-2xl">
+            <h2 class="brand-font text-xl font-bold mb-4 uppercase text-gray-800">Hatao Item?</h2>
+            <p class="text-[11px] text-gray-400 mb-8 uppercase tracking-widest leading-relaxed">Kya aap is item ko showroom se hatana chahte hain?</p>
             <div class="flex gap-4">
-                <button onclick="window.verifyAdmin()" class="w-full py-5 bg-[#B8860B] text-white rounded-2xl text-xs font-bold uppercase tracking-widest shadow-xl hover:bg-black transition-all">Verify Access</button>
+                <button onclick="window.closeDeleteModal()" class="flex-1 py-4 text-xs font-bold text-gray-400 uppercase">Nahi</button>
+                <button id="confirmDeleteBtn" class="flex-1 py-4 bg-red-500 text-white rounded-xl text-xs font-bold uppercase">Haan</button>
             </div>
         </div>
     </div>
 
     <div id="vModal" class="hidden fixed inset-0 modal-overlay flex flex-col items-center justify-center p-4 z-[9999]" onclick="window.closeFullImage()">
         <div class="relative max-w-4xl w-full flex flex-col items-center">
-            <button class="absolute -top-12 right-0 text-white text-3xl"><i class="fas fa-times"></i></button>
             <img id="lImg" src="" class="rounded-3xl shadow-2xl mb-6 max-h-[80vh] w-auto object-contain border-4 border-white/10" onclick="event.stopPropagation()">
             <div class="bg-white/10 backdrop-blur-md px-8 py-4 rounded-2xl border border-white/20 text-center">
                 <p id="lName" class="text-white font-bold uppercase tracking-[0.2em] text-lg"></p>
-                <p class="text-yellow-400 text-sm font-bold mt-1 tracking-widest">Exclusive Collection</p>
             </div>
         </div>
     </div>
@@ -227,39 +227,19 @@
             setTimeout(() => t.classList.remove('show'), 5000);
         };
 
-        window.openLogin = function() { 
-            document.getElementById('lModal').classList.remove('hidden'); 
-            setTimeout(()=>document.getElementById('pInput').focus(), 100); 
-        };
-        window.closeLogin = function() { 
-            document.getElementById('lModal').classList.add('hidden'); 
-            document.getElementById('pInput').value = ''; 
-        };
-        
-        window.logoutManual = function() { 
-            localStorage.removeItem('sjs_session_v21'); 
-            document.body.classList.remove('admin-active');
-            showToast("Logged out to Customer View");
-            setTimeout(() => location.reload(), 600);
-        };
-
-        window.verifyAdmin = function() {
-            const pin = document.getElementById('pInput').value;
-            if (pin === "sirvitarun9828") {
+        window.openLogin = () => { document.getElementById('lModal').classList.remove('hidden'); setTimeout(()=>document.getElementById('pInput').focus(), 100); };
+        window.closeLogin = () => { document.getElementById('lModal').classList.add('hidden'); document.getElementById('pInput').value = ''; };
+        window.logoutManual = () => { localStorage.removeItem('sjs_session_v21'); document.body.classList.remove('admin-active'); location.reload(); };
+        window.verifyAdmin = () => {
+            if (document.getElementById('pInput').value === "sirvitarun9828") {
                 document.body.classList.add('admin-active');
                 localStorage.setItem('sjs_session_v21', 'active');
                 window.closeLogin();
-                window.scrollTo({top:0, behavior:'smooth'});
-                showToast("Admin Verified Successfully! ✅");
-            } else { 
-                showToast("Invalid Pin!", true); 
-                document.getElementById('pInput').value = '';
-            }
+                showToast("Welcome Admin! ✅");
+            } else { showToast("Invalid Pin!", true); }
         };
 
-        if (localStorage.getItem('sjs_session_v21') === 'active') {
-            document.body.classList.add('admin-active');
-        }
+        if (localStorage.getItem('sjs_session_v21') === 'active') document.body.classList.add('admin-active');
 
         window.openFullImage = (url, name) => { 
             document.getElementById('lImg').src = url; 
@@ -267,29 +247,17 @@
             document.getElementById('vModal').classList.remove('hidden'); 
             document.body.style.overflow = 'hidden'; 
         };
-        window.closeFullImage = () => { 
-            document.getElementById('vModal').classList.add('hidden'); 
-            document.body.style.overflow = 'auto'; 
-        };
+        window.closeFullImage = () => { document.getElementById('vModal').classList.add('hidden'); document.body.style.overflow = 'auto'; };
         
         window.filterCategory = (cat, el) => {
             window.activeCat = cat;
-            document.querySelectorAll('nav a').forEach(a => {
-                a.classList.remove('nav-active');
-                a.classList.add('text-gray-400');
-            });
-            el.classList.add('nav-active');
-            el.classList.remove('text-gray-400');
+            document.querySelectorAll('nav a').forEach(a => { a.classList.remove('nav-active'); a.classList.add('text-gray-400'); });
+            el.classList.add('nav-active'); el.classList.remove('text-gray-400');
             if (window.renderTrigger) window.renderTrigger();
         };
-
         window.activeCat = 'All';
-        window.handleFileSelect = (el) => { 
-            if(el.files.length) {
-                document.getElementById('lTag').innerHTML = `<i class="fas fa-check-circle text-3xl mb-2 text-green-500"></i><span class="text-green-600">Photo Ready</span>`;
-                showToast("Photo selected!");
-            }
-        };
+        window.handleFileSelect = (el) => { if(el.files.length) document.getElementById('lTag').innerHTML = `<i class="fas fa-check-circle text-2xl text-green-500 mb-2"></i><span>Photo Ready</span>`; };
+        window.closeDeleteModal = () => document.getElementById('dModal').classList.add('hidden');
     </script>
 
     <script type="module">
@@ -297,148 +265,143 @@
         import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, collection, onSnapshot, addDoc, deleteDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        const appId = typeof __app_id !== 'undefined' ? __app_id : "shree-jagadamba-v21-final";
-        const firebaseConfig = JSON.parse(__firebase_config);
+        // IMPORTANT: GitHub par chalane ke liye aapko yahan apna config dalna hoga
+        // Gemini environment mein ye khud ba khud mil jata hai
+        let firebaseConfig;
+        try {
+            firebaseConfig = JSON.parse(__firebase_config);
+        } catch (e) {
+            console.error("Firebase config not found. Using default structure.");
+            // Agar GitHub par stuck hai, toh yahan apna Firebase Console se mila config paste karein:
+            /*
+            firebaseConfig = {
+                apiKey: "YOUR_API_KEY",
+                authDomain: "YOUR_PROJECT.firebaseapp.com",
+                projectId: "YOUR_PROJECT_ID",
+                storageBucket: "YOUR_PROJECT.appspot.com",
+                messagingSenderId: "YOUR_SENDER_ID",
+                appId: "YOUR_APP_ID"
+            };
+            */
+        }
         
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
+        const appId = typeof __app_id !== 'undefined' ? __app_id : "shree-jagadamba-v21-final";
+        
+        if (firebaseConfig) {
+            const app = initializeApp(firebaseConfig);
+            const auth = getAuth(app);
+            const db = getFirestore(app);
 
-        let userAccount = null;
+            let userAccount = null;
 
-        const initSystem = async () => {
-            try {
-                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                    await signInWithCustomToken(auth, __initial_auth_token);
-                } else {
-                    await signInAnonymously(auth);
-                }
-            } catch (error) {
-                setTimeout(initSystem, 2000);
-            }
-        };
-
-        onAuthStateChanged(auth, (user) => {
-            userAccount = user;
-            if (user) {
-                document.getElementById('loadingStatus').classList.add('hidden');
-                document.getElementById('authStatus').innerHTML = `<span class="w-2 h-2 bg-green-500 rounded-full"></span> Secure Connection Active`;
-                window.renderTrigger = loadStoreData;
-                trackActivity();
-                loadStoreData();
-            }
-        });
-
-        async function trackActivity() {
-            if (!userAccount) return;
-            if (!localStorage.getItem('sjs_v_v21')) {
+            const initAuth = async () => {
                 try {
-                    await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'visitors'), { timestamp: serverTimestamp() });
-                    localStorage.setItem('sjs_v_v21', 'logged');
-                } catch (e) {}
-            }
-            onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', 'visitors'), snap => {
-                const el = document.getElementById('vCount');
-                if(el) el.innerText = snap.size.toLocaleString();
-            });
-        }
-
-        function loadStoreData() {
-            if (!userAccount) return;
-            const productCol = collection(db, 'artifacts', appId, 'public', 'data', 'products');
-            onSnapshot(productCol, (snapshot) => {
-                const grid = document.getElementById('pGrid');
-                const noData = document.getElementById('noData');
-                grid.innerHTML = '';
-                let visibleCount = 0;
-                
-                snapshot.forEach((doc) => {
-                    const item = doc.data();
-                    if (window.activeCat === 'All' || item.cat === window.activeCat) {
-                        const card = document.createElement('div');
-                        card.className = "product-card group";
-                        card.onclick = () => window.openFullImage(item.img, item.n);
-                        card.innerHTML = `
-                            <button onclick="event.stopPropagation(); window.deleteItem('${doc.id}')" class="delete-btn"><i class="fas fa-trash-alt text-sm"></i></button>
-                            <div class="aspect-[3/4] overflow-hidden bg-gray-50 relative">
-                                <img src="${item.img}" class="w-full h-full object-cover transition duration-700 group-hover:scale-110" loading="lazy">
-                                <div class="absolute inset-0 bg-black/5 group-hover:bg-transparent transition-all"></div>
-                                <div class="absolute bottom-4 left-4"><span class="bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-[8px] font-black uppercase tracking-widest text-gray-800 shadow-sm border border-yellow-50">${item.cat}</span></div>
-                            </div>
-                            <div class="p-6 text-center">
-                                <h4 class="brand-font text-sm font-bold uppercase truncate tracking-tight text-gray-800">${item.n}</h4>
-                                <p class="text-xl font-black text-[#B8860B] mt-1 tracking-tight">₹${Number(item.p).toLocaleString()}</p>
-                            </div>`;
-                        grid.appendChild(card);
-                        visibleCount++;
+                    if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                        await signInWithCustomToken(auth, __initial_auth_token);
+                    } else {
+                        await signInAnonymously(auth);
                     }
-                });
-                document.getElementById('itemCount').innerText = visibleCount;
-                noData.classList.toggle('hidden', visibleCount > 0);
-            });
-        }
+                } catch (error) {
+                    document.getElementById('loadingMsg').innerText = "Database connection error. Please refresh.";
+                }
+            };
 
-        async function optimizeImage(file) {
-            return new Promise((resolve) => {
-                const reader = new FileReader();
-                reader.readAsDataURL(file);
-                reader.onload = (e) => {
-                    const img = new Image();
-                    img.src = e.target.result;
-                    img.onload = () => {
-                        const canvas = document.createElement('canvas');
-                        const TARGET_DIM = 850; 
-                        let width = img.width, height = img.height;
-                        if (width > height) { if(width > TARGET_DIM) { height *= TARGET_DIM/width; width = TARGET_DIM; } }
-                        else { if(height > TARGET_DIM) { width *= TARGET_DIM/height; height = TARGET_DIM; } }
-                        canvas.width = width; canvas.height = height;
-                        const ctx = canvas.getContext('2d');
-                        ctx.imageSmoothingEnabled = true;
-                        ctx.imageSmoothingQuality = 'high';
-                        ctx.drawImage(img, 0, 0, width, height);
-                        resolve(canvas.toDataURL('image/jpeg', 0.75)); 
+            onAuthStateChanged(auth, (user) => {
+                userAccount = user;
+                if (user) {
+                    document.getElementById('loadingStatus').classList.add('hidden');
+                    window.renderTrigger = loadData;
+                    trackVisitors();
+                    loadData();
+                }
+            });
+
+            async function trackVisitors() {
+                if (!localStorage.getItem('sjs_v_v21')) {
+                    try { await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'visitors'), { t: serverTimestamp() }); localStorage.setItem('sjs_v_v21', '1'); } catch (e) {}
+                }
+                onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', 'visitors'), snap => {
+                    const el = document.getElementById('vCount');
+                    if(el) el.innerText = snap.size.toLocaleString();
+                });
+            }
+
+            function loadData() {
+                const pRef = collection(db, 'artifacts', appId, 'public', 'data', 'products');
+                onSnapshot(pRef, (snap) => {
+                    const grid = document.getElementById('pGrid');
+                    grid.innerHTML = '';
+                    let count = 0;
+                    snap.forEach((doc) => {
+                        const item = doc.data();
+                        if (window.activeCat === 'All' || item.cat === window.activeCat) {
+                            const card = document.createElement('div');
+                            card.className = "product-card group animate-fade-in";
+                            card.onclick = () => window.openFullImage(item.img, item.n);
+                            card.innerHTML = `
+                                <button onclick="event.stopPropagation(); window.deleteItem('${doc.id}')" class="delete-btn"><i class="fas fa-trash-alt text-sm"></i></button>
+                                <div class="aspect-[3/4] overflow-hidden bg-gray-50"><img src="${item.img}" class="w-full h-full object-cover transition duration-700 group-hover:scale-110"></div>
+                                <div class="p-6 text-center"><h4 class="brand-font text-sm font-bold uppercase truncate text-gray-800">${item.n}</h4><p class="text-xl font-black text-[#B8860B] mt-1 tracking-tight">₹${Number(item.p).toLocaleString()}</p></div>`;
+                            grid.appendChild(card);
+                            count++;
+                        }
+                    });
+                    document.getElementById('itemCount').innerText = count;
+                    document.getElementById('noData').classList.toggle('hidden', count > 0);
+                });
+            }
+
+            async function optimizeImg(file) {
+                return new Promise((resolve) => {
+                    const r = new FileReader(); r.readAsDataURL(file);
+                    r.onload = (e) => {
+                        const i = new Image(); i.src = e.target.result;
+                        i.onload = () => {
+                            const c = document.createElement('canvas');
+                            const MAX = 800; // Better clarity
+                            let w = i.width, h = i.height;
+                            if (w > h) { if(w > MAX) { h *= MAX/w; w = MAX; } }
+                            else { if(h > MAX) { w *= MAX/h; h = MAX; } }
+                            c.width = w; c.height = h;
+                            const ctx = c.getContext('2d'); ctx.imageSmoothingQuality = 'high'; ctx.drawImage(i, 0, 0, w, h);
+                            resolve(c.toDataURL('image/jpeg', 0.8));
+                        };
                     };
-                };
-            });
-        }
-
-        window.addItem = async () => {
-            const nameField = document.getElementById('itemName');
-            const priceField = document.getElementById('itemPrice');
-            const catField = document.getElementById('itemCat');
-            const fileInput = document.getElementById('imgInp');
-            const btn = document.getElementById('uploadBtn');
-
-            if (!nameField.value.trim() || !priceField.value.trim() || !fileInput.files[0]) { 
-                showToast("Fill all fields!", true); return; 
-            }
-            
-            btn.disabled = true; 
-            btn.innerHTML = `<div class="loader-spin mx-auto"></div>`;
-
-            try {
-                const clearPhoto = await optimizeImage(fileInput.files[0]);
-                await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'products'), { 
-                    n: nameField.value.trim(), p: priceField.value.trim(), cat: catField.value, img: clearPhoto, timestamp: serverTimestamp() 
                 });
-                showToast("Uploaded Successfully! ✅");
-                nameField.value = ''; priceField.value = '';
-                document.getElementById('lTag').innerHTML = `<i class="fas fa-cloud-upload-alt text-3xl mb-2 text-yellow-600"></i><span>Select Photo</span>`;
-                fileInput.value = '';
-            } catch (err) { 
-                showToast("Upload failed", true); 
-            } finally { 
-                btn.disabled = false; btn.innerText = "Add Item"; 
             }
-        };
 
-        window.deleteItem = async (id) => {
-            if (confirm("Remove this item?")) {
-                try { await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'products', id)); } catch (e) {}
-            }
-        };
+            window.addItem = async () => {
+                const n = document.getElementById('itemName').value;
+                const p = document.getElementById('itemPrice').value;
+                const cat = document.getElementById('itemCat').value;
+                const file = document.getElementById('imgInp').files[0];
+                const btn = document.getElementById('uploadBtn');
 
-        initSystem();
+                if (!n || !p || !file) { showToast("Puri jaankari bhariye!", true); return; }
+                btn.disabled = true; btn.innerHTML = `<div class="loader-spin mx-auto"></div>`;
+
+                try {
+                    const img = await optimizeImg(file);
+                    if (img.length > 950000) { showToast("Photo size too large! Screenshot le kar try karein.", true); btn.disabled = false; btn.innerText = "Add Item"; return; }
+                    await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'products'), { n, p, cat, img, t: serverTimestamp() });
+                    showToast("Uploaded! ✅");
+                    document.getElementById('itemName').value = ''; document.getElementById('itemPrice').value = '';
+                    document.getElementById('lTag').innerHTML = `<i class="fas fa-cloud-upload-alt text-3xl mb-2 text-yellow-600"></i><span>Select High-Res Photo</span>`;
+                    document.getElementById('imgInp').value = '';
+                } catch (e) { showToast("Upload fail", true); } finally { btn.disabled = false; btn.innerText = "Add Item"; }
+            };
+
+            window.deleteItem = (id) => {
+                document.getElementById('dModal').classList.remove('hidden');
+                document.getElementById('confirmDeleteBtn').onclick = async () => {
+                    try { await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'products', id)); showToast("Deleted"); window.closeDeleteModal(); } catch (e) {}
+                };
+            };
+
+            initAuth();
+        } else {
+            document.getElementById('loadingMsg').innerHTML = "<span class='text-red-500'>Firebase Config Missing!</span><br><small>GitHub par dalne ke liye manual config zaroori hai.</small>";
+        }
     </script>
 </body>
 </html>
