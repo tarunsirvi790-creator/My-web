@@ -175,13 +175,18 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, collection, onSnapshot, addDoc, deleteDoc, serverTimestamp, enableIndexedDbPersistence } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+const firebaseConfig = {
+  apiKey: "YAHAN_APIKEY",
+  authDomain: "YAHAN_AUTHDOMAIN",
+  projectId: "YAHAN_PROJECTID",
+  storageBucket: "YAHAN_STORAGEBUCKET",
+  messagingSenderId: "YAHAN_SENDERID",
+  appId: "YAHAN_APPID"
+};
 
-        const config = JSON.parse(__firebase_config);
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'sjs-final-production-v7';
+const appId = "sjs-final-production-v7";
 
-        const app = initializeApp(config);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
+const app = initializeApp(firebaseConfig);
 
         // Fix for "Could not reach backend" error
         try {
