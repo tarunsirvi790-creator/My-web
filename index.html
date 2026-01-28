@@ -29,12 +29,15 @@
         .admin-only { display: none !important; }
         body.admin-active .admin-only { display: block !important; }
         
+        /* डिलीट बटन की स्टाइलिंग - ये सिर्फ एडमिन लॉगिन के बाद दिखेगा */
         .delete-btn { 
             display: none !important; position: absolute; top: 12px; right: 12px; z-index: 50; 
-            background: #ef4444; color: white; width: 32px; height: 32px; 
+            background: #ef4444; color: white; width: 35px; height: 35px; 
             border-radius: 50%; align-items: center; justify-content: center; 
-            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4); 
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4); border: 2px solid white;
+            transition: 0.3s;
         }
+        .delete-btn:hover { transform: scale(1.15); background: #b91c1c; }
         body.admin-active .delete-btn { display: flex !important; }
 
         .loader-spin { border: 3px solid #f3f3f3; border-top: 3px solid var(--gold); border-radius: 50%; width: 24px; height: 24px; animation: spin 1s linear infinite; }
@@ -159,18 +162,9 @@
         import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, collection, onSnapshot, addDoc, deleteDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // Global variables provided by environment or fallbacks
-             const firebaseConfig = {
-  apiKey: "AIzaSyXXXXXXXXXXXX",
-  authDomain: "my-side-11eef.firebaseapp.com",
-  projectId: "my-side-11eef",
-  storageBucket: "my-side-11eef.appspot.com",
-  messagingSenderId: "85450849605",
-  appId: "1:85450849605:web:XXXXXXXX"
-};
-
-
-
+        // Firebase Configuration
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {
+            apiKey: "AIzaSyBLLLFfbzRzB4oE-LT4QxbUmukO6SVRJ4I",
             authDomain: "my-side-11eef.firebaseapp.com",
             projectId: "my-side-11eef",
             storageBucket: "my-side-11eef.firebasestorage.app",
@@ -219,7 +213,6 @@
         function loadData() {
             if (!currentUser) return;
             
-            // Standard Path: artifacts/{appId}/public/data/products
             const pRef = collection(db, 'artifacts', appId, 'public', 'data', 'products');
             
             onSnapshot(pRef, (snap) => {
@@ -234,7 +227,9 @@
                         const card = document.createElement('div');
                         card.className = "product-card animate-fade-in";
                         card.innerHTML = `
-                            <button class="delete-btn" data-id="${doc.id}"><i class="fas fa-trash-alt text-sm"></i></button>
+                            <button class="delete-btn" title="Hatao Is Design Ko" data-id="${doc.id}">
+                                <i class="fas fa-trash-alt text-sm"></i>
+                            </button>
                             <div class="aspect-[3/4] overflow-hidden bg-gray-50">
                                 <img src="${item.img}" class="w-full h-full object-cover transition-all duration-700 hover:scale-110" onerror="this.src='https://via.placeholder.com/300x400?text=No+Image'">
                             </div>
@@ -243,11 +238,16 @@
                                 <p class="text-lg font-black text-[#B8860B] mt-1 tracking-tight">₹${Number(item.p).toLocaleString()}</p>
                             </div>`;
                         
+                        // Image click handler
                         card.onclick = () => window.openFullImage(item.img, item.n);
-                        card.querySelector('.delete-btn').onclick = (e) => {
-                            e.stopPropagation();
+                        
+                        // Delete click handler
+                        const delBtn = card.querySelector('.delete-btn');
+                        delBtn.onclick = (e) => {
+                            e.stopPropagation(); // Image modal na khule
                             window.deleteItem(doc.id);
                         };
+                        
                         grid.appendChild(card);
                     }
                 });
@@ -311,9 +311,12 @@
             document.getElementById('confirmDeleteBtn').onclick = async () => {
                 try {
                     await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'products', id));
-                    showToast("Design Hata Diya Gaya"); 
+                    showToast("Design Hata Diya Gaya! 🗑️"); 
                     window.closeDeleteModal();
-                } catch (e) { showToast("Error deleting", true); }
+                } catch (e) { 
+                    console.error("Delete Error:", e);
+                    showToast("Error deleting item", true); 
+                }
             };
         };
 
@@ -348,4 +351,4 @@
         if (localStorage.getItem('sjs_v21_active') === '1') document.body.classList.add('admin-active');
     </script>
 </body>
-</html>
+</html> 
