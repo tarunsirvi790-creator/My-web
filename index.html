@@ -172,10 +172,7 @@ const firebaseConfig = {
   appId: "1:85450849605:web:870172cbece91b6960922c",
   measurementId: "G-N2H0VT2XXJ"
 };
-
- 
- 
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'shree-jagadamba-v21';
+const appId = typeof __app_id !== 'undefined' ? __app_id : 'shree-jagadamba-v21';
 
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
