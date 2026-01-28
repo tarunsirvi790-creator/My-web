@@ -3,153 +3,261 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SJS Showroom | Professional Dashboard</title>
+    <title>SJS Showroom | Premium Catalogue</title>
     
-    <!-- Modern Frameworks -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Poppins:wght@300;400;500;600&display=swap');
         :root { --gold: #B8860B; --cream: #FFFAF0; --dark: #2D2424; }
-        body { font-family: 'Poppins', sans-serif; background-color: var(--cream); color: var(--dark); -webkit-tap-highlight-color: transparent; }
+        body { font-family: 'Poppins', sans-serif; background-color: var(--cream); color: var(--dark); margin: 0; }
         .brand-font { font-family: 'Playfair Display', serif; }
         .hero-gradient { background: linear-gradient(135deg, #ffffff 0%, #f3e5ab 100%); }
-        .product-card { background: white; border-radius: 20px; transition: all 0.3s ease; border: 1px solid rgba(184,134,11,0.1); cursor: zoom-in; }
-        .product-card:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(184,134,11,0.1); }
+        
+        .product-card { 
+            background: white; 
+            border-radius: 1.5rem; 
+            border: 1px solid rgba(184,134,11,0.1); 
+            overflow: hidden; 
+            position: relative; 
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        }
+        .product-card:hover { 
+            transform: translateY(-8px); 
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1); 
+        }
+        
         .nav-active { color: var(--gold); border-bottom: 3px solid var(--gold); font-weight: 700; }
-        .modal-overlay { background: rgba(0, 0, 0, 0.92); backdrop-filter: blur(10px); z-index: 2000; }
+        .modal-overlay { background: rgba(0, 0, 0, 0.9); backdrop-filter: blur(12px); z-index: 9999; }
         
         .admin-only { display: none !important; }
         body.admin-active .admin-only { display: block !important; }
-        body.admin-active .delete-btn { display: flex !important; }
         
-        .delete-btn { display: none !important; }
-        .no-scrollbar::-webkit-scrollbar { display: none; }
-        .loader-spin { border: 3px solid #f3f3f3; border-top: 3px solid var(--gold); border-radius: 50%; width: 24px; height: 24px; animation: spin 1s linear infinite; }
+        .delete-btn { 
+            display: none !important; 
+            position: absolute; top: 12px; right: 12px; z-index: 50; 
+            background: #ef4444; color: white; width: 36px; height: 36px; 
+            border-radius: 50%; align-items: center; justify-content: center; 
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4); 
+        }
+        body.admin-active .delete-btn { display: flex !important; }
+
+        .loader-spin { border: 3px solid #f3f3f3; border-top: 3px solid var(--gold); border-radius: 50%; width: 28px; height: 28px; animation: spin 1s linear infinite; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        
+        .custom-alert { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); z-index: 10000; padding: 14px 28px; border-radius: 1rem; color: white; font-weight: 600; box-shadow: 0 10px 30px rgba(0,0,0,0.3); transition: 0.4s; opacity: 0; pointer-events: none; text-align: center; }
+        .custom-alert.show { opacity: 1; pointer-events: auto; }
+
+        .no-scrollbar::-webkit-scrollbar { display: none; }
     </style>
 </head>
 <body class="overflow-x-hidden">
 
-    <!-- Header -->
-    <header class="hero-gradient shadow-sm">
-        <div class="max-w-7xl mx-auto px-6 py-10 flex flex-col items-center text-center">
-            <div class="mb-4 p-4 bg-white rounded-full shadow-xl inline-block">
-                <i class="fas fa-crown text-4xl text-[#B8860B]"></i>
+    <div id="toast" class="custom-alert bg-gray-900"></div>
+
+    <!-- Header Section -->
+    <header class="hero-gradient shadow-sm border-b border-yellow-100">
+        <div class="max-w-7xl mx-auto px-6 py-12 flex flex-col items-center text-center">
+            <div class="mb-5 p-6 bg-white rounded-full shadow-2xl inline-block border-2 border-yellow-50 relative">
+                <i class="fas fa-crown text-6xl text-[#B8860B]"></i>
+                <div class="absolute -top-1 -right-1 w-4 h-4 bg-yellow-400 rounded-full animate-pulse"></div>
             </div>
-            <h1 class="brand-font text-3xl md:text-6xl text-gray-800 font-bold uppercase tracking-tighter">Shree Jagadamba</h1>
-            <p class="brand-font text-lg md:text-2xl text-[#B8860B] tracking-[0.4em] font-semibold mt-1 uppercase text-center">Selection</p>
-            <p class="text-[9px] mt-4 text-gray-400 font-bold uppercase tracking-widest italic text-center">Anavatti, Shivamogga • Karnataka</p>
+            <h1 class="brand-font text-4xl md:text-6xl text-gray-800 font-bold uppercase tracking-tighter">Shree Jagadamba</h1>
+            <p class="brand-font text-xl md:text-2xl text-[#B8860B] tracking-[0.5em] font-semibold mt-1 uppercase">Selection</p>
+            <div class="flex items-center justify-center gap-2 mt-4 text-gray-400">
+                <i class="fas fa-map-marker-alt text-[10px]"></i>
+                <p class="text-[10px] font-bold uppercase tracking-widest italic">Anavatti, Shivamogga • Karnataka</p>
+            </div>
         </div>
         
-        <nav class="bg-white/95 sticky top-0 z-50 border-b border-gray-100 overflow-x-auto no-scrollbar">
-            <div class="max-w-7xl mx-auto flex justify-center space-x-8 py-4 px-6 whitespace-nowrap text-[10px] font-bold uppercase tracking-widest">
-                <a id="cat-All" href="javascript:void(0)" onclick="window.filterCategory('All', this)" class="nav-active py-1">Catalogue</a>
-                <a id="cat-Saree" href="javascript:void(0)" onclick="window.filterCategory('Saree', this)" class="text-gray-400 py-1">Sarees</a>
-                <a id="cat-Kurti" href="javascript:void(0)" onclick="window.filterCategory('Kurti', this)" class="text-gray-400 py-1">Kurtis</a>
-                <a id="cat-Kids" href="javascript:void(0)" onclick="window.filterCategory('Kids Wear', this)" class="text-gray-400 py-1">Kids Wear</a>
-                <a id="cat-Mens" href="javascript:void(0)" onclick="window.filterCategory('Mens Wear', this)" class="text-gray-400 py-1">Mens Wear</a>
+        <nav class="bg-white/95 sticky top-0 z-50 border-b border-gray-100 overflow-x-auto no-scrollbar shadow-sm">
+            <div class="max-w-7xl mx-auto flex justify-center space-x-8 py-5 px-6 whitespace-nowrap text-[11px] font-bold uppercase tracking-[0.15em]">
+                <a id="cat-All" href="javascript:void(0)" onclick="window.filterCategory('All', this)" class="nav-active py-1 transition-colors duration-300">Catalogue</a>
+                <a id="cat-Saree" href="javascript:void(0)" onclick="window.filterCategory('Saree', this)" class="text-gray-400 py-1 hover:text-[#B8860B]">Sarees</a>
+                <a id="cat-Kurti" href="javascript:void(0)" onclick="window.filterCategory('Kurti', this)" class="text-gray-400 py-1 hover:text-[#B8860B]">Kurtis</a>
+                <a id="cat-Kids" href="javascript:void(0)" onclick="window.filterCategory('Kids Wear', this)" class="text-gray-400 py-1 hover:text-[#B8860B]">Kids</a>
+                <a id="cat-Mens" href="javascript:void(0)" onclick="window.filterCategory('Mens Wear', this)" class="text-gray-400 py-1 hover:text-[#B8860B]">Mens</a>
             </div>
         </nav>
     </header>
 
-    <!-- Admin Panel -->
-    <section id="adminPanel" class="admin-only max-w-6xl mx-auto mt-6 p-6 bg-white rounded-[2rem] shadow-2xl border border-yellow-100 mx-4 lg:mx-auto">
-        <div class="flex justify-between items-center mb-6">
-            <div class="flex items-center gap-3">
-                <div class="w-10 h-10 bg-yellow-50 rounded-xl flex items-center justify-center text-[#B8860B]">
-                    <i class="fas fa-user-shield text-xl"></i>
+    <!-- Professional Notice -->
+    <div class="bg-red-600 py-3 text-center shadow-lg relative z-20">
+        <div class="max-w-7xl mx-auto px-6 flex items-center justify-center gap-3">
+            <i class="fas fa-exclamation-triangle text-white animate-pulse"></i>
+            <p class="text-[10px] md:text-xs text-white font-black uppercase tracking-[0.2em]">
+                PHYSICAL VISIT ONLY • VISIT OUR STORE TO PURCHASE • NO ONLINE DELIVERY
+            </p>
+        </div>
+    </div>
+
+    <!-- Admin Dashboard Panel -->
+    <section id="adminPanel" class="admin-only max-w-6xl mx-auto mt-8 p-8 bg-white rounded-[2.5rem] shadow-2xl border border-yellow-200 mx-4 lg:mx-auto">
+        <div class="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
+            <div class="flex items-center gap-4">
+                <div class="w-14 h-14 bg-yellow-50 rounded-2xl flex items-center justify-center text-[#B8860B] shadow-inner border border-yellow-100"><i class="fas fa-layer-group text-2xl"></i></div>
+                <div>
+                    <h2 class="brand-font text-2xl font-bold text-gray-800 uppercase">Store Management</h2>
+                    <p id="authStatus" class="text-[9px] text-green-600 font-bold uppercase tracking-[0.2em] flex items-center gap-1">
+                        <span class="w-2 h-2 bg-green-500 rounded-full"></span> Secure Connection Active
+                    </p>
                 </div>
-                <h2 class="brand-font text-lg font-bold text-gray-800 uppercase">Control Center</h2>
             </div>
-            <div class="bg-gray-800 text-white px-4 py-2 rounded-xl flex items-center gap-3">
-                <i class="fas fa-users text-yellow-400"></i>
-                <span id="vCount" class="font-bold">0</span>
+            <div class="bg-gray-900 text-white px-6 py-3 rounded-2xl flex items-center gap-4 shadow-xl">
+                <div class="flex flex-col">
+                    <span class="text-[8px] uppercase tracking-widest text-gray-400">Total Visitors</span>
+                    <span id="vCount" class="font-black text-2xl">0</span>
+                </div>
+                <i class="fas fa-users text-yellow-500 text-xl"></i>
             </div>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-5 gap-3 mb-6">
-            <input type="file" id="imgInp" class="hidden" accept="image/*" onchange="if(this.files.length) document.getElementById('lTag').innerText='Photo OK ✅'">
-            <label for="imgInp" id="lTag" class="flex items-center justify-center border-2 border-dashed border-gray-200 rounded-xl p-4 cursor-pointer bg-gray-50 text-[10px] font-bold text-gray-400 uppercase text-center shadow-inner">Add Saman Photo</label>
-            <input type="text" id="itemName" placeholder="Item Name" class="bg-gray-50 border p-4 rounded-xl text-sm outline-none">
-            <input type="text" id="itemPrice" placeholder="Price (₹)" class="bg-gray-50 border p-4 rounded-xl text-sm outline-none">
-            <select id="itemCat" class="bg-gray-50 border p-4 rounded-xl text-sm font-bold text-gray-600 outline-none">
-                <option value="Saree">Saree</option>
-                <option value="Kurti">Kurti</option>
-                <option value="Kids Wear">Kids Wear</option>
-                <option value="Mens Wear">Mens Wear</option>
-            </select>
-            <button id="uploadBtn" onclick="window.addItem()" class="bg-[#B8860B] text-white font-bold py-4 rounded-xl uppercase text-xs shadow-lg active:scale-95 transition">Upload Karein</button>
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-4 mb-8">
+            <div class="md:col-span-3">
+                <input type="file" id="imgInp" class="hidden" accept="image/*" onchange="window.handleFileSelect(this)">
+                <label for="imgInp" id="lTag" class="flex flex-col items-center justify-center border-2 border-dashed border-gray-200 rounded-2xl p-6 cursor-pointer bg-gray-50 text-[10px] font-bold text-gray-400 uppercase text-center shadow-inner hover:bg-yellow-50 hover:border-yellow-200 transition-all h-full">
+                    <i class="fas fa-cloud-upload-alt text-3xl mb-2 text-yellow-600"></i>
+                    <span>Select High-Res Photo</span>
+                </label>
+            </div>
+            <div class="md:col-span-3">
+                <input type="text" id="itemName" placeholder="Product Name" class="w-full h-full bg-gray-50 border border-gray-100 p-5 rounded-2xl text-sm outline-none focus:ring-2 focus:ring-yellow-500 transition-all font-medium">
+            </div>
+            <div class="md:col-span-2">
+                <input type="text" id="itemPrice" placeholder="Price (₹)" class="w-full h-full bg-gray-50 border border-gray-100 p-5 rounded-2xl text-sm outline-none focus:ring-2 focus:ring-yellow-500 transition-all font-bold text-yellow-700">
+            </div>
+            <div class="md:col-span-2">
+                <select id="itemCat" class="w-full h-full bg-gray-50 border border-gray-100 p-5 rounded-2xl text-sm font-bold text-gray-600 outline-none focus:ring-2 focus:ring-yellow-500 appearance-none cursor-pointer">
+                    <option value="Saree">Saree</option>
+                    <option value="Kurti">Kurti</option>
+                    <option value="Kids Wear">Kids Wear</option>
+                    <option value="Mens Wear">Mens Wear</option>
+                </select>
+            </div>
+            <div class="md:col-span-2">
+                <button id="uploadBtn" onclick="window.addItem()" class="w-full h-full bg-[#B8860B] hover:bg-black text-white font-bold rounded-2xl uppercase text-[11px] shadow-lg active:scale-95 transition-all py-5 md:py-0">
+                    <i class="fas fa-plus-circle mr-2"></i> Add Item
+                </button>
+            </div>
         </div>
 
-        <div class="flex justify-center border-t pt-4 text-center">
-            <button onclick="window.logout()" class="text-red-500 font-bold text-[10px] uppercase tracking-widest"><i class="fas fa-power-off"></i> Logout Dashboard</button>
+        <div class="flex flex-wrap justify-center gap-4 border-t border-gray-50 pt-6">
+            <!-- View Store Button -->
+            <button onclick="window.scrollTo({top: document.getElementById('pGrid').offsetTop - 150, behavior: 'smooth'})" class="text-[#B8860B] font-bold text-[10px] uppercase tracking-[0.2em] flex items-center gap-2 hover:bg-yellow-50 px-6 py-3 rounded-full border border-yellow-100 transition-all">
+                <i class="fas fa-eye"></i> View Live Store
+            </button>
+            
+            <!-- Logout Button -->
+            <button onclick="window.logoutManual()" class="text-red-500 font-bold text-[10px] uppercase tracking-[0.2em] flex items-center gap-2 hover:bg-red-50 px-6 py-3 rounded-full border border-red-50 transition-all">
+                <i class="fas fa-sign-out-alt"></i> Secure Logout
+            </button>
         </div>
     </section>
 
-    <!-- Content Grid -->
-    <main class="max-w-7xl mx-auto px-4 py-10">
-        <div id="loadingStatus" class="flex flex-col items-center justify-center py-20 text-gray-400 text-center">
-            <div class="loader-spin mb-3"></div>
-            <p id="loadingMsg" class="text-[10px] uppercase tracking-widest">Dukaan se data jud raha hai...</p>
+    <!-- Main Catalogue Display -->
+    <main class="max-w-7xl mx-auto px-4 py-16">
+        <div id="loadingStatus" class="flex flex-col items-center justify-center py-24 text-gray-400 text-center">
+            <div class="loader-spin mb-4"></div>
+            <p id="loadingMsg" class="text-[11px] uppercase tracking-[0.3em] font-medium">Fetching Collection from Shree Jagadamba...</p>
         </div>
-        <div class="text-center mb-8">
-             <p class="text-[9px] text-red-500 font-bold uppercase italic underline decoration-red-200">
-                ⚠️ Store Visit Only • <span id="itemCount">0</span> Items Online
-            </p>
+        
+        <div class="flex flex-col items-center mb-12">
+            <div class="h-1 w-20 bg-yellow-600 mb-4 rounded-full"></div>
+            <h3 class="brand-font text-3xl font-bold text-gray-800">Latest Arrivals</h3>
+             <p class="text-[10px] text-gray-400 font-bold uppercase tracking-[0.3em] mt-2">
+                Showcasing <span id="itemCount" class="text-yellow-600">0</span> Exclusive Designs
+             </p>
         </div>
-        <div id="pGrid" class="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8"></div>
+
+        <div id="pGrid" class="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-10">
+            <!-- Products will appear here -->
+        </div>
+        
+        <div id="noData" class="hidden flex flex-col items-center justify-center py-20 text-gray-300">
+            <i class="fas fa-search text-5xl mb-4"></i>
+            <p class="text-xs uppercase font-bold tracking-widest">No items found in this category</p>
+        </div>
     </main>
 
-    <!-- Footer Login -->
-    <footer class="py-12 text-center border-t border-gray-100 bg-white">
-        <button id="ownerLoginBtn" onclick="window.openLogin()" class="text-[10px] text-gray-400 uppercase tracking-widest font-bold border px-8 py-3 rounded-full hover:bg-gray-50 transition shadow-sm">Owner Login</button>
+    <!-- Footer -->
+    <footer class="py-16 text-center border-t border-yellow-50 bg-white">
+        <p class="brand-font text-2xl font-bold text-gray-800 mb-3 tracking-tight">Shree Jagadamba Selection</p>
+        <p class="text-[9px] text-gray-400 uppercase tracking-[0.5em] mb-8 font-medium italic">Timeless Elegance • Traditional Grace</p>
+        <button onclick="window.openLogin()" class="text-[11px] text-gray-400 uppercase tracking-[0.2em] font-bold border border-gray-100 px-10 py-4 rounded-full hover:bg-black hover:text-white hover:border-black transition-all shadow-sm">
+            <i class="fas fa-lock mr-2"></i> Owner Dashboard
+        </button>
     </footer>
 
     <!-- Modals -->
     <div id="lModal" class="hidden fixed inset-0 modal-overlay flex items-center justify-center p-6 text-center">
-        <div class="bg-white rounded-[2.5rem] p-10 max-w-sm w-full shadow-2xl">
-            <h2 class="brand-font text-xl font-bold mb-6 uppercase text-center">Owner Access</h2>
-            <input type="password" id="pInput" placeholder="Password" class="w-full p-4 bg-gray-50 border rounded-xl text-center font-bold tracking-[0.4em] text-xl outline-none mb-6">
+        <div class="bg-white rounded-[3rem] p-12 max-w-sm w-full shadow-2xl relative">
+            <button onclick="window.closeLogin()" class="absolute top-6 right-8 text-gray-300 hover:text-gray-800"><i class="fas fa-times"></i></button>
+            <div class="w-16 h-16 bg-yellow-50 rounded-2xl flex items-center justify-center text-[#B8860B] mx-auto mb-6 shadow-inner">
+                <i class="fas fa-shield-alt text-2xl"></i>
+            </div>
+            <h2 class="brand-font text-2xl font-bold mb-2 uppercase text-gray-800">Admin Login</h2>
+            <p class="text-[10px] text-gray-400 uppercase tracking-widest mb-8">Access Store Management</p>
+            <input type="password" id="pInput" placeholder="Enter Pin" class="w-full p-5 bg-gray-50 border border-gray-100 rounded-2xl text-center font-bold tracking-[0.6em] text-2xl outline-none mb-8 focus:ring-2 focus:ring-yellow-500">
             <div class="flex gap-4">
-                <button onclick="window.closeLogin()" class="flex-1 py-4 text-xs font-bold text-gray-400 uppercase text-center">Cancel</button>
-                <button onclick="window.verifyAdmin()" class="flex-[2] py-4 bg-[#B8860B] text-white rounded-xl text-xs font-bold uppercase shadow-lg text-center">Login</button>
+                <button onclick="window.verifyAdmin()" class="w-full py-5 bg-[#B8860B] text-white rounded-2xl text-xs font-bold uppercase tracking-widest shadow-xl hover:bg-black transition-all">Verify Access</button>
             </div>
         </div>
     </div>
 
-    <div id="vModal" class="hidden fixed inset-0 modal-overlay flex flex-col items-center justify-center p-4" onclick="window.closeFullImage()">
-        <img id="lImg" src="" class="rounded-lg shadow-2xl mb-4 max-h-[75vh] object-contain" onclick="event.stopPropagation()">
-        <p id="lName" class="text-white font-bold uppercase tracking-widest text-center"></p>
+    <div id="vModal" class="hidden fixed inset-0 modal-overlay flex flex-col items-center justify-center p-4 z-[9999]" onclick="window.closeFullImage()">
+        <div class="relative max-w-4xl w-full flex flex-col items-center">
+            <button class="absolute -top-12 right-0 text-white text-3xl"><i class="fas fa-times"></i></button>
+            <img id="lImg" src="" class="rounded-3xl shadow-2xl mb-6 max-h-[80vh] w-auto object-contain border-4 border-white/10" onclick="event.stopPropagation()">
+            <div class="bg-white/10 backdrop-blur-md px-8 py-4 rounded-2xl border border-white/20 text-center">
+                <p id="lName" class="text-white font-bold uppercase tracking-[0.2em] text-lg"></p>
+                <p class="text-yellow-400 text-sm font-bold mt-1 tracking-widest">Exclusive Collection</p>
+            </div>
+        </div>
     </div>
 
-    <!-- UI Logic (Safe from DB failures) -->
     <script>
-        window.openLogin = () => { 
-            document.getElementById('lModal').classList.remove('hidden'); 
-            setTimeout(() => document.getElementById('pInput').focus(), 100);
+        const showToast = (msg, isError = false) => {
+            const t = document.getElementById('toast');
+            if(!t) return;
+            t.innerText = msg;
+            t.style.backgroundColor = isError ? '#ef4444' : '#111827';
+            t.classList.add('show');
+            setTimeout(() => t.classList.remove('show'), 5000);
         };
-        window.closeLogin = () => { 
+
+        window.openLogin = function() { 
+            document.getElementById('lModal').classList.remove('hidden'); 
+            setTimeout(()=>document.getElementById('pInput').focus(), 100); 
+        };
+        window.closeLogin = function() { 
             document.getElementById('lModal').classList.add('hidden'); 
             document.getElementById('pInput').value = ''; 
         };
-        window.verifyAdmin = () => {
-            if (document.getElementById('pInput').value === "sirvitarun9828") {
+        
+        window.logoutManual = function() { 
+            localStorage.removeItem('sjs_session_v21'); 
+            document.body.classList.remove('admin-active');
+            showToast("Logged out to Customer View");
+            setTimeout(() => location.reload(), 600);
+        };
+
+        window.verifyAdmin = function() {
+            const pin = document.getElementById('pInput').value;
+            if (pin === "sirvitarun9828") {
                 document.body.classList.add('admin-active');
-                localStorage.setItem('sjs_session_v7', 'active');
+                localStorage.setItem('sjs_session_v21', 'active');
                 window.closeLogin();
                 window.scrollTo({top:0, behavior:'smooth'});
-            } else { alert("Galat Password!"); }
-        };
-        window.logout = () => {
-            if(confirm("Logout Dashboard?")) {
-                document.body.classList.remove('admin-active');
-                localStorage.removeItem('sjs_session_v7');
+                showToast("Admin Verified Successfully! ✅");
+            } else { 
+                showToast("Invalid Pin!", true); 
+                document.getElementById('pInput').value = '';
             }
         };
 
-        if (localStorage.getItem('sjs_session_v7') === 'active') {
+        if (localStorage.getItem('sjs_session_v21') === 'active') {
             document.body.classList.add('admin-active');
         }
 
@@ -159,94 +267,118 @@
             document.getElementById('vModal').classList.remove('hidden'); 
             document.body.style.overflow = 'hidden'; 
         };
-        window.closeFullImage = () => { document.getElementById('vModal').classList.add('hidden'); document.body.style.overflow = 'auto'; };
+        window.closeFullImage = () => { 
+            document.getElementById('vModal').classList.add('hidden'); 
+            document.body.style.overflow = 'auto'; 
+        };
         
         window.filterCategory = (cat, el) => {
             window.activeCat = cat;
-            document.querySelectorAll('nav a').forEach(a => a.className = "text-gray-400 py-1");
-            el.className = "nav-active py-1";
-            if (window.loadDataFunc) window.loadDataFunc();
+            document.querySelectorAll('nav a').forEach(a => {
+                a.classList.remove('nav-active');
+                a.classList.add('text-gray-400');
+            });
+            el.classList.add('nav-active');
+            el.classList.remove('text-gray-400');
+            if (window.renderTrigger) window.renderTrigger();
         };
+
         window.activeCat = 'All';
+        window.handleFileSelect = (el) => { 
+            if(el.files.length) {
+                document.getElementById('lTag').innerHTML = `<i class="fas fa-check-circle text-3xl mb-2 text-green-500"></i><span class="text-green-600">Photo Ready</span>`;
+                showToast("Photo selected!");
+            }
+        };
     </script>
 
-    <!-- System Logic -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, collection, onSnapshot, addDoc, deleteDoc, serverTimestamp, enableIndexedDbPersistence } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, collection, onSnapshot, addDoc, deleteDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        const config = JSON.parse(__firebase_config);
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'sjs-final-production-v7';
-
-        const app = initializeApp(config);
+        const appId = typeof __app_id !== 'undefined' ? __app_id : "shree-jagadamba-v21-final";
+        const firebaseConfig = JSON.parse(__firebase_config);
+        
+        const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        // Fix for "Could not reach backend" error
-        try {
-            enableIndexedDbPersistence(db).catch(() => console.log("Offline mode active"));
-        } catch(e) {}
+        let userAccount = null;
+
+        const initSystem = async () => {
+            try {
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    await signInWithCustomToken(auth, __initial_auth_token);
+                } else {
+                    await signInAnonymously(auth);
+                }
+            } catch (error) {
+                setTimeout(initSystem, 2000);
+            }
+        };
 
         onAuthStateChanged(auth, (user) => {
+            userAccount = user;
             if (user) {
                 document.getElementById('loadingStatus').classList.add('hidden');
-                window.loadDataFunc = loadData;
-                trackVisitors();
-                loadData();
-            } else {
-                signInAnonymously(auth);
+                document.getElementById('authStatus').innerHTML = `<span class="w-2 h-2 bg-green-500 rounded-full"></span> Secure Connection Active`;
+                window.renderTrigger = loadStoreData;
+                trackActivity();
+                loadStoreData();
             }
         });
 
-        async function trackVisitors() {
-            const trackKey = 'sjs_visit_v7';
-            if (!localStorage.getItem(trackKey)) {
+        async function trackActivity() {
+            if (!userAccount) return;
+            if (!localStorage.getItem('sjs_v_v21')) {
                 try {
-                    await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'visitors'), { t: serverTimestamp() });
-                    localStorage.setItem(trackKey, 'true');
+                    await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'visitors'), { timestamp: serverTimestamp() });
+                    localStorage.setItem('sjs_v_v21', 'logged');
                 } catch (e) {}
             }
             onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', 'visitors'), snap => {
-                document.getElementById('vCount').innerText = snap.size;
+                const el = document.getElementById('vCount');
+                if(el) el.innerText = snap.size.toLocaleString();
             });
         }
 
-        function loadData() {
-            const pRef = collection(db, 'artifacts', appId, 'public', 'data', 'products');
-            onSnapshot(pRef, (snap) => {
+        function loadStoreData() {
+            if (!userAccount) return;
+            const productCol = collection(db, 'artifacts', appId, 'public', 'data', 'products');
+            onSnapshot(productCol, (snapshot) => {
                 const grid = document.getElementById('pGrid');
+                const noData = document.getElementById('noData');
                 grid.innerHTML = '';
-                let count = 0;
-                snap.forEach((doc) => {
-                    const data = doc.data();
-                    if (window.activeCat === 'All' || data.cat === window.activeCat) {
-                        grid.appendChild(createCard(doc.id, data));
-                        count++;
+                let visibleCount = 0;
+                
+                snapshot.forEach((doc) => {
+                    const item = doc.data();
+                    if (window.activeCat === 'All' || item.cat === window.activeCat) {
+                        const card = document.createElement('div');
+                        card.className = "product-card group";
+                        card.onclick = () => window.openFullImage(item.img, item.n);
+                        card.innerHTML = `
+                            <button onclick="event.stopPropagation(); window.deleteItem('${doc.id}')" class="delete-btn"><i class="fas fa-trash-alt text-sm"></i></button>
+                            <div class="aspect-[3/4] overflow-hidden bg-gray-50 relative">
+                                <img src="${item.img}" class="w-full h-full object-cover transition duration-700 group-hover:scale-110" loading="lazy">
+                                <div class="absolute inset-0 bg-black/5 group-hover:bg-transparent transition-all"></div>
+                                <div class="absolute bottom-4 left-4"><span class="bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-[8px] font-black uppercase tracking-widest text-gray-800 shadow-sm border border-yellow-50">${item.cat}</span></div>
+                            </div>
+                            <div class="p-6 text-center">
+                                <h4 class="brand-font text-sm font-bold uppercase truncate tracking-tight text-gray-800">${item.n}</h4>
+                                <p class="text-xl font-black text-[#B8860B] mt-1 tracking-tight">₹${Number(item.p).toLocaleString()}</p>
+                            </div>`;
+                        grid.appendChild(card);
+                        visibleCount++;
                     }
                 });
-                document.getElementById('itemCount').innerText = count;
-            }, (err) => {
-                document.getElementById('loadingMsg').innerText = "Connection Slow Hai... Par website chalegi!";
+                document.getElementById('itemCount').innerText = visibleCount;
+                noData.classList.toggle('hidden', visibleCount > 0);
             });
         }
 
-        function createCard(id, data) {
-            const div = document.createElement('div');
-            div.className = "product-card overflow-hidden group relative";
-            div.onclick = () => window.openFullImage(data.img, data.n);
-            div.innerHTML = `
-                <button onclick="event.stopPropagation(); window.deleteItem('${id}')" class="delete-btn absolute top-3 right-3 z-30 bg-red-500 text-white w-8 h-8 rounded-full flex items-center justify-center shadow-lg active:scale-90"><i class="fas fa-trash-alt text-xs"></i></button>
-                <div class="aspect-[3/4] overflow-hidden bg-gray-100"><img src="${data.img}" class="w-full h-full object-cover"></div>
-                <div class="p-4 text-center">
-                    <h4 class="text-[10px] font-bold uppercase truncate">${data.n}</h4>
-                    <p class="text-base font-bold text-[#B8860B] mt-1">₹${data.p}</p>
-                </div>`;
-            return div;
-        }
-
-        // HEAVY COMPRESSOR (Fixed for 100% success)
-        async function compress(file) {
+        async function optimizeImage(file) {
             return new Promise((resolve) => {
                 const reader = new FileReader();
                 reader.readAsDataURL(file);
@@ -255,42 +387,58 @@
                     img.src = e.target.result;
                     img.onload = () => {
                         const canvas = document.createElement('canvas');
-                        const MAX = 650; // Smaller size for instant sync
-                        let w = img.width, h = img.height;
-                        if (w > h) { if(w > MAX) { h *= MAX/w; w = MAX; } }
-                        else { if(h > MAX) { w *= MAX/h; h = MAX; } }
-                        canvas.width = w; canvas.height = h;
-                        canvas.getContext('2d').drawImage(img, 0, 0, w, h);
-                        resolve(canvas.toDataURL('image/jpeg', 0.4));
+                        const TARGET_DIM = 850; 
+                        let width = img.width, height = img.height;
+                        if (width > height) { if(width > TARGET_DIM) { height *= TARGET_DIM/width; width = TARGET_DIM; } }
+                        else { if(height > TARGET_DIM) { width *= TARGET_DIM/height; height = TARGET_DIM; } }
+                        canvas.width = width; canvas.height = height;
+                        const ctx = canvas.getContext('2d');
+                        ctx.imageSmoothingEnabled = true;
+                        ctx.imageSmoothingQuality = 'high';
+                        ctx.drawImage(img, 0, 0, width, height);
+                        resolve(canvas.toDataURL('image/jpeg', 0.75)); 
                     };
                 };
             });
         }
 
         window.addItem = async () => {
-            const n = document.getElementById('itemName').value;
-            const p = document.getElementById('itemPrice').value;
-            const cat = document.getElementById('itemCat').value;
-            const file = document.getElementById('imgInp').files[0];
+            const nameField = document.getElementById('itemName');
+            const priceField = document.getElementById('itemPrice');
+            const catField = document.getElementById('itemCat');
+            const fileInput = document.getElementById('imgInp');
             const btn = document.getElementById('uploadBtn');
 
-            if (!n || !p || !file) { alert("Adhoori jankari!"); return; }
-            btn.disabled = true; btn.innerText = "Processing...";
+            if (!nameField.value.trim() || !priceField.value.trim() || !fileInput.files[0]) { 
+                showToast("Fill all fields!", true); return; 
+            }
+            
+            btn.disabled = true; 
+            btn.innerHTML = `<div class="loader-spin mx-auto"></div>`;
 
             try {
-                const compressed = await compress(file);
-                await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'products'), { n, p, cat, img: compressed, t: serverTimestamp() });
-                alert("Stock Upload Ho Gaya! ✅");
-                document.getElementById('itemName').value = '';
-                document.getElementById('itemPrice').value = '';
-                document.getElementById('lTag').innerText = "Add Photo";
-            } catch (e) { alert("Error: Internet slow hai."); }
-            finally { btn.disabled = false; btn.innerText = "Upload Karein"; }
+                const clearPhoto = await optimizeImage(fileInput.files[0]);
+                await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'products'), { 
+                    n: nameField.value.trim(), p: priceField.value.trim(), cat: catField.value, img: clearPhoto, timestamp: serverTimestamp() 
+                });
+                showToast("Uploaded Successfully! ✅");
+                nameField.value = ''; priceField.value = '';
+                document.getElementById('lTag').innerHTML = `<i class="fas fa-cloud-upload-alt text-3xl mb-2 text-yellow-600"></i><span>Select Photo</span>`;
+                fileInput.value = '';
+            } catch (err) { 
+                showToast("Upload failed", true); 
+            } finally { 
+                btn.disabled = false; btn.innerText = "Add Item"; 
+            }
         };
 
         window.deleteItem = async (id) => {
-            if (confirm("Showroom se hatayein?")) await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'products', id));
+            if (confirm("Remove this item?")) {
+                try { await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'products', id)); } catch (e) {}
+            }
         };
+
+        initSystem();
     </script>
 </body>
 </html>
