@@ -160,8 +160,15 @@
         import { getFirestore, doc, collection, onSnapshot, addDoc, deleteDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         // Global variables provided by environment or fallbacks
-        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {
-            apiKey: "AIzaSyBLLLFfbzRzB4oE-LT4QxbUmukO6SVRJ4I",
+              const firebaseConfig = {
+            apiKey: "AIzaSyXXXXXXXXXXXX",
+            authDomain: "my-side-11eef.firebaseapp.com",
+            projectId: "my-side-11eef",
+            storageBucket: "my-side-11eef.appspot.com",
+             messagingSenderId: "85450849605",
+          appId: "1:85450849605:web:XXXXXXXX"
+          };
+
             authDomain: "my-side-11eef.firebaseapp.com",
             projectId: "my-side-11eef",
             storageBucket: "my-side-11eef.firebasestorage.app",
