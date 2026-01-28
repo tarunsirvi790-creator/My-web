@@ -1,4 +1,4 @@
- <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -152,11 +152,11 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, collection, onSnapshot, addDoc, deleteDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // Correct Firebase Configuration
-        const firebaseConfig = {
+        // Global config handling
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {
             apiKey: "AIzaSyBLLLFfbzRzB4oE-LT4QxbUmukO6SVRJ4I",
             authDomain: "my-side-11eef.firebaseapp.com",
             projectId: "my-side-11eef",
@@ -164,7 +164,7 @@
             messagingSenderId: "85450849605",
             appId: "1:85450849605:web:870172cbece91b6960922c"
         };
-        const appId = "shree-jagadamba-v21";
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'shree-jagadamba-v21';
 
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
@@ -173,7 +173,7 @@
         let currentUser = null;
         window.activeCat = 'All';
 
-        // Fix: Assign functions to window immediately
+        // Register Global Functions Early
         window.openLogin = () => { 
             document.getElementById('lModal').classList.remove('hidden'); 
             setTimeout(() => document.getElementById('pInput').focus(), 100); 
@@ -192,8 +192,8 @@
         window.closeDeleteModal = () => document.getElementById('dModal').classList.add('hidden');
         window.openFullImage = (url, name) => { 
             const imgEl = document.getElementById('lImg');
-            if(imgEl) imgEl.src = url; 
             const nameEl = document.getElementById('lName');
+            if(imgEl) imgEl.src = url; 
             if(nameEl) nameEl.innerText = name; 
             document.getElementById('vModal').classList.remove('hidden'); 
             document.body.style.overflow = 'hidden'; 
@@ -206,17 +206,23 @@
         const showToast = (msg, isError = false) => {
             const t = document.getElementById('toast');
             if(!t) return;
-            t.innerText = msg; t.style.backgroundColor = isError ? '#ef4444' : '#111827';
-            t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 4000);
+            t.innerText = msg; 
+            t.style.backgroundColor = isError ? '#ef4444' : '#111827';
+            t.classList.add('show'); 
+            setTimeout(() => t.classList.remove('show'), 4000);
         };
 
         const initAuth = async () => {
             try {
-                await signInAnonymously(auth);
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    await signInWithCustomToken(auth, __initial_auth_token);
+                } else {
+                    await signInAnonymously(auth);
+                }
             } catch (error) {
                 console.error("Auth error:", error);
                 document.getElementById('loadingMsg').innerText = "Auth Lock. Please check API Key Settings.";
-                showToast("Firebase API Key Error", true);
+                showToast("Firebase Config Error", true);
             }
         };
 
@@ -237,14 +243,14 @@
                 const grid = document.getElementById('pGrid');
                 grid.innerHTML = '';
                 let hasItems = false;
-                snap.forEach((doc) => {
-                    const item = doc.data();
+                snap.forEach((docSnap) => {
+                    const item = docSnap.data();
                     if (window.activeCat === 'All' || item.cat === window.activeCat) {
                         hasItems = true;
                         const card = document.createElement('div');
                         card.className = "product-card animate-fade-in";
                         card.innerHTML = `
-                            <button class="delete-btn" data-id="${doc.id}"><i class="fas fa-trash-alt text-sm"></i></button>
+                            <button class="delete-btn" data-id="${docSnap.id}"><i class="fas fa-trash-alt text-sm"></i></button>
                             <div class="aspect-[3/4] overflow-hidden bg-gray-50">
                                 <img src="${item.img}" class="w-full h-full object-cover transition-all duration-700 hover:scale-110" onerror="this.src='https://via.placeholder.com/300x400?text=No+Image'">
                             </div>
@@ -255,14 +261,14 @@
                         card.onclick = () => window.openFullImage(item.img, item.n);
                         card.querySelector('.delete-btn').onclick = (e) => {
                             e.stopPropagation();
-                            window.deleteItem(doc.id);
+                            window.deleteItem(docSnap.id);
                         };
                         grid.appendChild(card);
                     }
                 });
                 document.getElementById('noData').classList.toggle('hidden', hasItems);
             }, (err) => {
-                console.error("Data error:", err);
+                console.error("Firestore Listen Error:", err);
                 showToast("Database Permission Denied", true);
             });
         }
@@ -277,7 +283,8 @@
             if (!name || !price || !fileInput.files[0]) return showToast("Puri jaankari bhariye!", true);
             
             const btn = document.getElementById('uploadBtn');
-            btn.disabled = true; btn.innerText = "Processing...";
+            btn.disabled = true; 
+            btn.innerText = "Processing...";
             
             try {
                 const formData = new FormData();
@@ -289,7 +296,11 @@
                 if (!clData.secure_url) throw new Error("Upload Error");
 
                 await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'products'), { 
-                    n: name, p: price, cat: cat, img: clData.secure_url, timestamp: serverTimestamp() 
+                    n: name, 
+                    p: price, 
+                    cat: cat, 
+                    img: clData.secure_url, 
+                    timestamp: serverTimestamp() 
                 });
                 
                 showToast("Dukaan Update Ho Gayi! ✅");
@@ -297,8 +308,13 @@
                 document.getElementById('itemPrice').value = '';
                 fileInput.value = '';
                 document.getElementById('lTag').innerHTML = `<i class="fas fa-camera text-3xl mb-2 text-yellow-600"></i><span>Photo Chuno</span>`;
-            } catch (e) { showToast("Upload Failed", true); }
-            finally { btn.disabled = false; btn.innerText = "Upload Karein"; }
+            } catch (e) { 
+                console.error("Upload error:", e);
+                showToast("Upload Failed", true); 
+            } finally { 
+                btn.disabled = false; 
+                btn.innerText = "Upload Karein"; 
+            }
         };
 
         window.deleteItem = (id) => {
@@ -308,7 +324,10 @@
                     await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'products', id));
                     showToast("Design Hata Diya Gaya! 🗑️"); 
                     window.closeDeleteModal();
-                } catch (e) { showToast("Error deleting", true); }
+                } catch (e) { 
+                    console.error("Delete error:", e);
+                    showToast("Error deleting", true); 
+                }
             };
         };
 
@@ -329,7 +348,9 @@
             } else { showToast("Galt Pin Hai!", true); }
         };
 
-        if (localStorage.getItem('sjs_v21_active') === '1') document.body.classList.add('admin-active');
+        if (localStorage.getItem('sjs_v21_active') === '1') {
+            document.body.classList.add('admin-active');
+        }
     </script>
 </body>
 </html>
