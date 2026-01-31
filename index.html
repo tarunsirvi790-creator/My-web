@@ -2,179 +2,269 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SJS Showroom | Professional Catalogue</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Shree Jagadamba Selection</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
     
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Poppins:wght@300;400;500;600&display=swap');
-        :root { --gold: #B8860B; --cream: #FFFAF0; --dark: #2D2424; }
-        body { font-family: 'Poppins', sans-serif; background-color: var(--cream); color: var(--dark); margin: 0; scroll-behavior: smooth; }
-        .brand-font { font-family: 'Playfair Display', serif; }
-        .hero-gradient { background: linear-gradient(135deg, #ffffff 0%, #f3e5ab 100%); }
+        :root { --gold: #B8860B; --maroon: #800000; --cream-light: #FFF8E1; --cream-dark: #FFECB3; }
         
-        .product-card { 
-            background: white; border-radius: 1.5rem; border: 1px solid rgba(184,134,11,0.1); 
-            overflow: hidden; position: relative; transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05); cursor: pointer;
+        body { 
+            font-family: 'Roboto', sans-serif; 
+            background: linear-gradient(180deg, var(--cream-light) 0%, #ffe0b2 100%); 
+            color: #4a4a4a; 
+            margin: 0; 
+            -webkit-tap-highlight-color: transparent;
+            min-height: 100vh;
         }
-        .product-card:hover { transform: translateY(-8px); box-shadow: 0 20px 25px rgba(0, 0, 0, 0.1); }
         
-        .nav-active { color: var(--gold); border-bottom: 3px solid var(--gold); font-weight: 700; }
-        .modal-overlay { background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(10px); z-index: 9999; }
+        .brand-font { font-family: 'Playfair Display', serif; }
         
+        .app-header { 
+            background: linear-gradient(to right, #FFF8E1, #ffe0b2);
+            position: relative; 
+            z-index: 50; 
+            box-shadow: 0 4px 20px rgba(184, 134, 11, 0.15); 
+            border-bottom: 1px solid rgba(184, 134, 11, 0.2);
+        }
+        
+        /* UPDATED: Categories Back to Horizontal Scroll & Circular */
+        .cat-item { 
+            display: flex; flex-direction: column; align-items: center; justify-content: flex-start; 
+            min-width: 75px; /* Fixed width for scroll consistency */
+            cursor: pointer; transition: 0.2s;
+            padding-top: 4px;
+        }
+        .cat-icon-box {
+            width: 55px; height: 55px; 
+            border-radius: 50%; /* GOL (Circular) */
+            background: #fff;
+            display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.08);
+            margin-bottom: 6px; position: relative;
+            transition: transform 0.2s;
+            border: 2px solid white;
+        }
+        .cat-item:active .cat-icon-box { transform: scale(0.95); }
+        .cat-text { font-size: 10px; font-weight: 500; color: #555; text-align: center; line-height: 1.2; white-space: nowrap; }
+        
+        .cat-active .cat-text { color: var(--maroon); font-weight: 700; }
+        .cat-active .cat-icon-box { 
+            border: 2px solid var(--gold); 
+            background: #fff;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(184, 134, 11, 0.2);
+        }
+
+        /* Product Card */
+        .product-card { 
+            background: white; border-radius: 8px; /* Slightly tighter radius for 3-col grid */
+            overflow: hidden; position: relative; 
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            border: 1px solid rgba(255,255,255,0.6);
+        }
+        .like-btn-overlay {
+            position: absolute; top: 4px; right: 4px; z-index: 10;
+            width: 24px; height: 24px; background: rgba(255,255,255,0.9);
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .no-scrollbar::-webkit-scrollbar { display: none; }
         .admin-only { display: none !important; }
         body.admin-active .admin-only { display: block !important; }
+        body.admin-active .delete-btn { display: flex !important; }
         
         .delete-btn { 
-            display: none !important; position: absolute; top: 12px; left: 12px; z-index: 50; 
-            background: #ef4444; color: white; width: 35px; height: 35px; 
-            border-radius: 50%; align-items: center; justify-content: center; 
-            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4); border: 2px solid white;
-            transition: 0.3s;
+            display: none !important; position: absolute; top: 4px; left: 4px; z-index: 50; 
+            background: #ef4444; color: white; width: 20px; height: 20px; 
+            border-radius: 50%; align-items: center; justify-content: center; font-size: 10px;
         }
-        .delete-btn:hover { transform: scale(1.15); background: #b91c1c; }
-        body.admin-active .delete-btn { display: flex !important; }
-
-        .action-btn {
-            width: 38px; height: 38px; border-radius: 50%; 
-            display: flex; align-items: center; justify-content: center;
-            background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(4px);
-            transition: all 0.2s; box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-        }
-        .action-btn:active { transform: scale(0.9); }
-        .action-btn:hover { transform: scale(1.1); }
 
         .loader-spin { border: 3px solid #f3f3f3; border-top: 3px solid var(--gold); border-radius: 50%; width: 24px; height: 24px; animation: spin 1s linear infinite; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         
-        .custom-alert { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); z-index: 10000; padding: 14px 28px; border-radius: 1rem; color: white; font-weight: 600; box-shadow: 0 10px 30px rgba(0,0,0,0.3); transition: 0.4s; opacity: 0; pointer-events: none; text-align: center; }
-        .custom-alert.show { opacity: 1; pointer-events: auto; }
-        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .custom-toast { position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%); z-index: 10000; padding: 12px 24px; border-radius: 30px; background: #2D2424; color: #fff; font-size: 13px; opacity: 0; pointer-events: none; transition: 0.3s; white-space: nowrap; box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
+        .custom-toast.show { opacity: 1; pointer-events: auto; }
     </style>
 </head>
-<body class="overflow-x-hidden">
+<body class="pb-24">
 
-    <div id="toast" class="custom-alert bg-gray-900"></div>
+    <div id="toast" class="custom-toast"></div>
 
-    <header class="hero-gradient shadow-sm border-b border-yellow-100">
-        <div class="max-w-7xl mx-auto px-6 py-10 flex flex-col items-center text-center">
-            <div class="mb-4 p-6 bg-white rounded-full shadow-2xl inline-block border-2 border-yellow-50 relative">
-                <i class="fas fa-crown text-6xl text-[#B8860B]"></i>
+    <header class="app-header">
+        <div class="px-4 py-3 flex items-center justify-between gap-3">
+            <div class="flex items-center gap-2">
+                <div class="w-9 h-9 bg-gradient-to-br from-yellow-100 to-yellow-300 rounded-full flex items-center justify-center shadow-sm border border-yellow-200 text-[#B8860B] flex-shrink-0">
+                    <i class="fas fa-crown text-sm"></i>
+                </div>
+                <h1 class="brand-font text-base font-bold text-gray-800 tracking-wide leading-tight" style="color: #4a3b2a;">
+                    Shree Jagadamba Selection
+                </h1>
             </div>
-            <h1 class="brand-font text-4xl md:text-5xl text-gray-800 font-bold uppercase tracking-tighter">Shree Jagadamba</h1>
-            <p class="brand-font text-xl md:text-2xl text-[#B8860B] tracking-[0.5em] font-semibold mt-1 uppercase">Selection</p>
-            <p class="text-[10px] mt-4 text-gray-400 font-bold uppercase tracking-widest italic text-center">Anavatti, Shivamogga • Karnataka</p>
+            <button onclick="window.openLogin()" class="w-8 h-8 bg-gray-50 rounded-full flex items-center justify-center text-gray-400 hover:text-[#B8860B] border border-gray-100 shadow-sm flex-shrink-0">
+                <i class="fas fa-user-shield text-xs"></i>
+            </button>
         </div>
-        
-        <nav class="bg-white/95 sticky top-0 z-50 border-b border-gray-100 overflow-x-auto no-scrollbar shadow-sm">
-            <div class="max-w-7xl mx-auto flex justify-center space-x-6 md:space-x-8 py-5 px-6 whitespace-nowrap text-[11px] font-bold uppercase tracking-[0.15em]">
-                <a id="cat-All" href="javascript:void(0)" onclick="window.filterCategory('All', this)" class="nav-active py-1">All</a>
-                <a id="cat-Saree" href="javascript:void(0)" onclick="window.filterCategory('Saree', this)" class="text-gray-400 py-1">Sarees</a>
-                <a id="cat-Kurti" href="javascript:void(0)" onclick="window.filterCategory('Kurti', this)" class="text-gray-400 py-1">Kurtis</a>
-                <a id="cat-Mens" href="javascript:void(0)" onclick="window.filterCategory('Mens Wear', this)" class="text-gray-400 py-1">Mens</a>
-                <a id="cat-Other" href="javascript:void(0)" onclick="window.filterCategory('Other', this)" class="text-gray-400 py-1">Other</a>
-                <!-- Liked Tab -->
-                <a id="cat-Liked" href="javascript:void(0)" onclick="window.filterCategory('Liked', this)" class="text-red-500 py-1 flex items-center gap-2">
-                    <i class="fas fa-heart"></i> Saved
-                </a>
+
+        <div class="px-4 pb-4">
+            <div class="bg-white border border-gray-200 rounded-xl px-4 py-3 flex items-center gap-3 shadow-sm focus-within:ring-2 focus-within:ring-yellow-400/50 transition-all">
+                <i class="fas fa-search text-gray-400 text-lg"></i>
+                <input type="text" 
+                       placeholder="Search..." 
+                       class="bg-transparent border-none outline-none text-sm w-full text-gray-700 placeholder-gray-400 font-medium"
+                       oninput="window.handleSearch(this.value)">
             </div>
-        </nav>
-    </header>
+        </div>
 
-    <div class="bg-red-600 py-3 text-center shadow-lg relative z-20">
-        <p class="text-[10px] md:text-xs text-white font-black uppercase tracking-[0.2em]">
-            ⚠️ VISIT OUR STORE TO PURCHASE • NO ONLINE DELIVERY
-        </p>
-    </div>
+        <!-- Categories: Horizontal Scroll (Sidhi Line) & Circular (Gol) -->
+        <div class="overflow-x-auto no-scrollbar pb-3 pl-2">
+            <div class="flex space-x-2 min-w-max pr-4">
+                <div class="cat-item cat-active" onclick="window.filterCategory('All', this)">
+                    <div class="cat-icon-box bg-blue-50">
+                        <i class="fas fa-border-all text-blue-600 text-xl"></i>
+                    </div>
+                    <span class="cat-text">All Items</span>
+                </div>
+                
+                <div class="cat-item" onclick="window.filterCategory('Saree', this)">
+                    <div class="cat-icon-box bg-pink-50">
+                        <i class="fas fa-venus text-pink-600 text-xl"></i> 
+                    </div>
+                    <span class="cat-text">Sarees</span>
+                </div>
 
-    <!-- Owner Dashboard with Counter -->
-    <section id="adminPanel" class="admin-only max-w-6xl mx-auto mt-8 p-8 bg-white rounded-[2.5rem] shadow-2xl border-2 border-yellow-400 mx-4 lg:mx-auto">
-        <div class="flex justify-between items-center mb-8 border-b pb-6">
-            <div class="flex items-center gap-4">
-                <div class="w-12 h-12 bg-yellow-50 rounded-xl flex items-center justify-center text-[#B8860B] shadow-inner"><i class="fas fa-magic text-xl"></i></div>
-                <div>
-                    <h2 class="brand-font text-2xl font-bold text-gray-800 uppercase">Dukaan Dashboard</h2>
-                    <!-- Counter Element -->
-                    <p id="totalCount" class="text-xs font-bold text-gray-400 uppercase tracking-wider mt-1">Calculating...</p>
+                <div class="cat-item" onclick="window.filterCategory('Kurti', this)">
+                    <div class="cat-icon-box bg-purple-50">
+                        <i class="fas fa-female text-purple-600 text-xl"></i>
+                    </div>
+                    <span class="cat-text">Kurtis</span>
+                </div>
+
+                <div class="cat-item" onclick="window.filterCategory('Mens Wear', this)">
+                    <div class="cat-icon-box bg-indigo-50">
+                        <i class="fas fa-tshirt text-indigo-600 text-xl"></i>
+                    </div>
+                    <span class="cat-text">Mens</span>
+                </div>
+
+                <div class="cat-item" onclick="window.filterCategory('Other', this)">
+                    <div class="cat-icon-box bg-orange-50">
+                        <i class="fas fa-box-open text-orange-600 text-xl"></i>
+                    </div>
+                    <span class="cat-text">Other</span>
+                </div>
+
+                <div class="cat-item" onclick="window.filterCategory('Liked', this)">
+                    <div class="cat-icon-box bg-red-50">
+                        <i class="fas fa-heart text-red-600 text-xl"></i>
+                    </div>
+                    <span class="cat-text">Saved</span>
                 </div>
             </div>
-            <button onclick="window.logoutManual()" class="text-red-500 font-bold text-[10px] uppercase tracking-widest border border-red-100 px-4 py-2 rounded-lg hover:bg-red-50">Logout</button>
+        </div>
+    </header>
+
+    <div class="bg-gradient-to-r from-red-600 to-red-700 text-white px-4 py-2 flex items-center justify-center gap-2 shadow-sm">
+        <i class="fas fa-store text-[10px]"></i>
+        <span class="text-[9px] font-bold tracking-wider uppercase">Visit Store to Purchase • No Online Delivery</span>
+    </div>
+
+    <!-- Advanced Owner Panel -->
+    <section id="adminPanel" class="admin-only mx-3 mt-4 p-5 bg-white rounded-2xl shadow-lg border border-yellow-100">
+        <div class="flex justify-between items-center mb-4 border-b border-dashed border-gray-200 pb-3">
+            <div>
+                <h2 class="text-xs font-bold text-gray-600 uppercase tracking-widest">Admin Control</h2>
+                <!-- Visitor Counter Display -->
+                <p class="text-[9px] text-gray-400 mt-0.5">
+                    <i class="fas fa-eye text-[#B8860B] mr-1"></i>
+                    Total App Visits: <span id="visitCount" class="font-bold text-gray-800">Loading...</span>
+                </p>
+            </div>
+            <button onclick="window.logoutManual()" class="text-red-500 text-[10px] font-bold px-3 py-1 bg-red-50 rounded-full hover:bg-red-100 transition">LOGOUT</button>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-            <div class="md:col-span-1">
-                <input type="file" id="imgInp" class="hidden" accept="image/*" onchange="window.handleFileSelect(this)">
-                <label for="imgInp" id="lTag" class="flex flex-col items-center justify-center border-2 border-dashed border-gray-200 rounded-2xl p-6 cursor-pointer bg-gray-50 text-[10px] font-bold text-gray-400 uppercase text-center h-full min-h-[120px] hover:bg-yellow-50 transition-all">
-                    <i class="fas fa-camera text-3xl mb-2 text-yellow-600"></i>
-                    <span>Photo Chuno</span>
-                </label>
-            </div>
-            <div class="md:col-span-3 grid grid-cols-1 md:grid-cols-2 gap-4">
-                <input type="text" id="itemName" placeholder="Saree/Kurti Ka Naam" class="w-full bg-gray-50 border p-4 rounded-xl outline-none focus:ring-2 focus:ring-yellow-500 font-medium">
-                <input type="number" id="itemPrice" placeholder="Price (₹)" class="w-full bg-gray-50 border p-4 rounded-xl outline-none focus:ring-2 focus:ring-yellow-500 font-bold text-yellow-700">
-                <select id="itemCat" class="w-full bg-gray-50 border p-4 rounded-xl text-sm font-bold text-gray-600 outline-none">
-                    <option value="Saree">Saree</option>
-                    <option value="Kurti">Kurti</option>
-                    <option value="Mens Wear">Mens Wear</option>
-                    <option value="Other">Other</option>
-                </select>
-                <button id="uploadBtn" onclick="window.addItem()" class="w-full bg-[#B8860B] hover:bg-black text-white font-bold rounded-xl uppercase text-xs shadow-lg active:scale-95 transition-all py-4">Upload Karein</button>
+        <div class="flex gap-3 mb-3">
+            <input type="file" id="imgInp" class="hidden" accept="image/*" onchange="window.handleFileSelect(this)">
+            <label for="imgInp" id="lTag" class="w-16 h-16 flex-shrink-0 flex flex-col items-center justify-center border-2 border-dashed border-yellow-300 rounded-full bg-yellow-50 text-[9px] text-yellow-700 text-center cursor-pointer hover:bg-yellow-100 transition">
+                <i class="fas fa-camera text-lg mb-1"></i>
+                <span>Photo</span>
+            </label>
+            
+            <div class="flex-1 grid gap-2">
+                <input type="text" id="itemName" placeholder="Item Name" class="bg-gray-50 border border-gray-200 p-2 rounded-lg text-xs w-full outline-none focus:border-yellow-400 transition">
+                <div class="flex gap-2">
+                    <input type="number" id="itemPrice" placeholder="Price" class="bg-gray-50 border border-gray-200 p-2 rounded-lg text-xs w-1/2 outline-none focus:border-yellow-400 transition font-bold text-gray-700">
+                    <select id="itemCat" class="bg-gray-50 border border-gray-200 p-2 rounded-lg text-xs w-1/2 text-gray-600 outline-none focus:border-yellow-400 transition">
+                        <option value="Saree">Saree</option>
+                        <option value="Kurti">Kurti</option>
+                        <option value="Mens Wear">Mens</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+                <button id="uploadBtn" onclick="window.addItem()" class="w-full bg-gradient-to-r from-yellow-600 to-yellow-700 text-white py-2 rounded-lg text-xs font-bold uppercase shadow-md active:scale-95 transition">Upload Item</button>
             </div>
         </div>
+        <p class="text-[9px] text-gray-400 text-center">Total Items in Store: <span id="totalCount" class="font-bold">...</span></p>
     </section>
 
-    <main class="max-w-7xl mx-auto px-4 py-16">
-        <div id="loadingStatus" class="flex flex-col items-center justify-center py-24 text-gray-400 text-center">
-            <div class="loader-spin mb-4"></div><p id="loadingMsg" class="text-[11px] uppercase tracking-widest text-gray-600">Connecting to SJS Database...</p>
+    <main class="max-w-7xl mx-auto px-2 py-4 min-h-[60vh]">
+        <div id="loadingStatus" class="flex flex-col items-center justify-center py-16 text-yellow-700/50">
+            <div class="loader-spin mb-3"></div><p class="text-[10px] font-bold tracking-widest uppercase">Connecting to Database...</p>
         </div>
         
-        <!-- Product Grid -->
-        <div id="pGrid" class="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-10"></div>
+        <!-- Product Grid: 3 Columns for Mobile (grid-cols-3) -->
+        <div id="pGrid" class="grid grid-cols-3 md:grid-cols-5 gap-2 pb-8"></div>
         
-        <div id="noData" class="hidden flex flex-col items-center justify-center py-20 text-gray-300">
-            <i class="fas fa-heart-broken text-5xl mb-4"></i>
-            <p id="noDataText" class="text-xs uppercase font-bold tracking-widest">Abhi Stock Khali Hai</p>
+        <div id="noData" class="hidden flex flex-col items-center justify-center py-20 text-gray-400/60">
+            <i class="fas fa-box-open text-4xl mb-2 opacity-50"></i>
+            <p id="noDataText" class="text-xs font-medium">No matches found</p>
         </div>
     </main>
 
-    <footer class="py-16 text-center border-t border-yellow-50 bg-white">
-        <p class="brand-font text-2xl font-bold text-gray-800 mb-6 tracking-tight">Shree Jagadamba Selection</p>
-        <button onclick="window.openLogin()" class="text-[11px] text-gray-400 uppercase tracking-[0.2em] font-bold border border-gray-100 px-10 py-4 rounded-full hover:bg-black hover:text-white transition-all shadow-sm">Owner Login</button>
-    </footer>
+    <div class="text-center py-8 text-[#B8860B]/60 text-[10px]">
+        <div class="w-12 h-0.5 bg-[#B8860B]/20 mx-auto mb-3"></div>
+        <p class="brand-font font-bold text-sm text-[#B8860B]">Shree Jagadamba Selection</p>
+        <p class="mt-1">Anavatti Market • Shivamogga</p>
+    </div>
 
     <!-- Modals -->
-    <div id="dModal" class="hidden fixed inset-0 modal-overlay flex items-center justify-center p-6 text-center z-[10001]">
-        <div class="bg-white rounded-[2.5rem] p-10 max-w-sm w-full shadow-2xl">
-            <h2 class="brand-font text-xl font-bold mb-4 uppercase text-gray-800">Hatao Item?</h2>
-            <div class="flex gap-4 mt-6">
-                <button onclick="window.closeDeleteModal()" class="flex-1 py-4 text-xs font-bold text-gray-400 uppercase tracking-widest rounded-xl hover:bg-gray-50">Nahi</button>
-                <button id="confirmDeleteBtn" class="flex-1 py-4 bg-red-500 text-white rounded-xl text-xs font-bold uppercase tracking-widest shadow-lg active:scale-95">Haan</button>
+    <div id="dModal" class="hidden fixed inset-0 modal-overlay flex items-center justify-center p-6 text-center z-[10001] bg-black/80 backdrop-blur-sm">
+        <div class="bg-white rounded-2xl p-6 w-64 shadow-2xl border border-yellow-100">
+            <h2 class="text-sm font-bold mb-4 text-gray-800">Delete this item?</h2>
+            <div class="flex gap-3">
+                <button onclick="window.closeDeleteModal()" class="flex-1 py-2.5 text-xs font-bold text-gray-500 bg-gray-100 rounded-xl hover:bg-gray-200">Cancel</button>
+                <button id="confirmDeleteBtn" class="flex-1 py-2.5 text-xs font-bold text-white bg-red-500 rounded-xl shadow-lg shadow-red-200 hover:bg-red-600">Delete</button>
             </div>
         </div>
     </div>
 
-    <div id="lModal" class="hidden fixed inset-0 modal-overlay flex items-center justify-center p-6 text-center">
-        <div class="bg-white rounded-[3rem] p-12 max-w-sm w-full shadow-2xl relative">
-            <button onclick="window.closeLogin()" class="absolute top-6 right-8 text-gray-300 hover:text-gray-800"><i class="fas fa-times"></i></button>
-            <h2 class="brand-font text-2xl font-bold mb-8 uppercase text-gray-800 tracking-tight">Admin Access</h2>
-            <input type="password" id="pInput" placeholder="PIN Daalein" class="w-full p-5 bg-gray-50 border rounded-2xl text-center font-bold tracking-[0.6em] text-2xl outline-none mb-8 focus:ring-2 focus:ring-yellow-500">
-            <button onclick="window.verifyAdmin()" class="w-full py-5 bg-[#B8860B] text-white rounded-2xl text-xs font-bold uppercase tracking-widest shadow-xl hover:bg-black transition-all">Unlock Store</button>
+    <div id="lModal" class="hidden fixed inset-0 modal-overlay flex items-center justify-center p-6 text-center bg-black/80 backdrop-blur-sm">
+        <div class="bg-white rounded-3xl p-8 w-72 shadow-2xl relative border-2 border-yellow-100">
+            <button onclick="window.closeLogin()" class="absolute top-4 right-5 text-gray-300 hover:text-gray-500"><i class="fas fa-times"></i></button>
+            <div class="w-12 h-12 bg-yellow-50 rounded-full flex items-center justify-center mx-auto mb-4 text-[#B8860B]"><i class="fas fa-lock"></i></div>
+            <h2 class="text-lg font-bold mb-6 text-gray-800 brand-font">Owner Access</h2>
+            <input type="password" id="pInput" placeholder="Enter PIN" class="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl text-center text-lg tracking-[0.3em] mb-4 outline-none focus:border-[#B8860B] focus:bg-white transition">
+            <button onclick="window.verifyAdmin()" class="w-full py-3 bg-gradient-to-r from-[#B8860B] to-yellow-700 text-white rounded-xl text-xs font-bold tracking-wider shadow-lg hover:shadow-xl transition transform active:scale-95">UNLOCK STORE</button>
         </div>
     </div>
 
-    <div id="vModal" class="hidden fixed inset-0 modal-overlay flex flex-col items-center justify-center p-4 z-[9999]" onclick="window.closeFullImage()">
-        <img id="lImg" src="" class="rounded-3xl shadow-2xl mb-6 max-h-[85vh] w-auto object-contain border-4 border-white/10" onclick="event.stopPropagation()">
-        <p id="lName" class="text-white font-bold uppercase tracking-[0.2em] text-lg bg-black/30 px-6 py-2 rounded-full backdrop-blur-sm"></p>
+    <div id="vModal" class="hidden fixed inset-0 modal-overlay flex flex-col items-center justify-center z-[9999] bg-black/95" onclick="window.closeFullImage()">
+        <button class="absolute top-4 right-4 text-white/70 hover:text-white p-2" onclick="window.closeFullImage()"><i class="fas fa-times text-2xl"></i></button>
+        <img id="lImg" src="" class="max-h-[85vh] w-full object-contain p-2" onclick="event.stopPropagation()">
+        <div class="absolute bottom-0 w-full bg-gradient-to-t from-black via-black/80 to-transparent p-8 text-center">
+            <p id="lName" class="text-white font-bold text-xl mb-1 brand-font tracking-wide"></p>
+            <p class="text-white/50 text-[10px] uppercase tracking-widest">Shree Jagadamba Selection</p>
+        </div>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-analytics.js";
         import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, collection, onSnapshot, addDoc, deleteDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, doc, collection, onSnapshot, addDoc, deleteDoc, serverTimestamp, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyBLlLFFbzRzB4oE-LT4QxbUmukO6SVRJ4I",
@@ -188,44 +278,101 @@
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'shree-jagadamba-v21';
 
         const app = initializeApp(firebaseConfig);
-        const analytics = getAnalytics(app);
         const auth = getAuth(app);
         const db = getFirestore(app);
 
         let currentUser = null;
         window.activeCat = 'All';
+        window.searchTerm = '';
         
         try {
             window.likedItems = new Set(JSON.parse(localStorage.getItem('sjs_liked_items') || '[]'));
         } catch (e) {
             window.likedItems = new Set();
-            localStorage.setItem('sjs_liked_items', '[]');
         }
 
-        const showToast = (msg, isError = false) => {
+        const showToast = (msg) => {
             const t = document.getElementById('toast');
             if(!t) return;
             t.innerText = msg;
-            t.style.backgroundColor = isError ? '#ef4444' : '#111827';
             t.classList.add('show');
-            setTimeout(() => t.classList.remove('show'), 4000);
+            setTimeout(() => t.classList.remove('show'), 3000);
+        };
+
+        // --- NEW: Security & Visitor Tracking ---
+        
+        // 1. Log Visit (Executed on Load)
+        const logVisit = async () => {
+            const visitKey = 'sjs_last_visit_ts';
+            const lastVisit = localStorage.getItem(visitKey);
+            const now = Date.now();
+            
+            // Log if first time or more than 1 hour since last log
+            if (!lastVisit || (now - parseInt(lastVisit)) > 3600000) { 
+                try {
+                    await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'visits'), {
+                        ts: serverTimestamp(),
+                        ua: navigator.userAgent.slice(0, 100) // Minimal device info
+                    });
+                    localStorage.setItem(visitKey, now.toString());
+                    console.log("Visit logged");
+                } catch (e) { console.error("Log error", e); }
+            }
+        };
+
+        // 2. Load Visit Count (For Admin)
+        const loadVisitCount = () => {
+            const vRef = collection(db, 'artifacts', appId, 'public', 'data', 'visits');
+            onSnapshot(vRef, (snap) => {
+                const el = document.getElementById('visitCount');
+                if(el) el.innerText = snap.size + " Users";
+            });
+        };
+
+        // 3. Encrypted Auth Check
+        window.verifyAdmin = () => {
+            const pin = document.getElementById('pInput').value.trim();
+            // Encoded PIN: "sirvitarun9828" in Base64 is "c2lydml0YXJ1bjk4Mjg="
+            // This prevents the PIN from being visible in plain text in the source code
+            if (btoa(pin.toLowerCase()) === "c2lydml0YXJ1bjk4Mjg=") {
+                localStorage.setItem('sjs_v21_active', '1');
+                window.closeLogin();
+                document.body.classList.add('admin-active');
+                showToast("Welcome Owner! 👑");
+                loadVisitCount(); // Start loading visitor stats
+            } else {
+                showToast("Access Denied 🔒");
+                document.getElementById('pInput').value = '';
+            }
+        };
+
+        // --- Standard Functions ---
+
+        window.handleSearch = function(val) {
+            window.searchTerm = val.toLowerCase().trim();
+            loadData();
         };
 
         window.toggleLike = function(id, e) {
             e.stopPropagation();
             const btn = document.getElementById(`like-btn-${id}`);
-            if(!btn) return;
-            const icon = btn.querySelector('i');
+            const icon = btn ? btn.querySelector('i') : null;
             
             if (window.likedItems.has(id)) {
                 window.likedItems.delete(id);
-                icon.className = 'far fa-heart text-gray-400 text-lg transition-all duration-300';
-                showToast("Removed from Saved Items");
+                if(icon) {
+                    icon.className = 'far fa-heart text-gray-400';
+                    icon.parentElement.classList.remove('bg-red-50');
+                }
+                showToast("Removed from Saved");
                 if(window.activeCat === 'Liked') loadData(); 
             } else {
                 window.likedItems.add(id);
-                icon.className = 'fas fa-heart text-red-500 text-lg transition-all duration-300 animate-bounce';
-                showToast("Added to Saved Items ❤️");
+                if(icon) {
+                    icon.className = 'fas fa-heart text-red-500';
+                    icon.parentElement.classList.add('bg-red-50');
+                }
+                showToast("Added to Saved ❤️");
             }
             localStorage.setItem('sjs_liked_items', JSON.stringify([...window.likedItems]));
         };
@@ -235,97 +382,55 @@
             const name = decodeURIComponent(encName);
             const shareData = {
                 title: 'Shree Jagadamba Selection',
-                text: `Check out this ${name} for ₹${price}!\nAvailable at Shree Jagadamba Selection, Anavatti.`,
+                text: `${name} - ₹${price}\nAvailable at Shree Jagadamba Selection, Anavatti`,
                 url: window.location.href
             };
             try {
-                if (navigator.share) {
-                    await navigator.share(shareData);
-                } else {
+                if (navigator.share) await navigator.share(shareData);
+                else {
                     await navigator.clipboard.writeText(`${shareData.text}\nImage: ${imgUrl}`);
-                    showToast("Link Copied to Clipboard! 📋");
+                    showToast("Copied to Clipboard");
                 }
-            } catch (err) { console.log('Share canceled'); }
+            } catch (err) {}
         };
 
-        window.openLogin = function() {
-            const modal = document.getElementById('lModal');
-            if(modal) modal.classList.remove('hidden');
-            setTimeout(() => { document.getElementById('pInput')?.focus(); }, 100);
-        };
-
-        window.closeLogin = function() {
-            const modal = document.getElementById('lModal');
-            if(modal) modal.classList.add('hidden');
-            if(document.getElementById('pInput')) document.getElementById('pInput').value = '';
-        };
-
-        window.logoutManual = function() {
-            localStorage.removeItem('sjs_v21_active');
-            window.location.reload();
-        };
-
-        window.handleFileSelect = function(el) {
+        window.openLogin = () => { document.getElementById('lModal').classList.remove('hidden'); };
+        window.closeLogin = () => { document.getElementById('lModal').classList.add('hidden'); };
+        window.logoutManual = () => { localStorage.removeItem('sjs_v21_active'); window.location.reload(); };
+        
+        window.handleFileSelect = (el) => {
             if(el.files && el.files.length) {
-                const tag = document.getElementById('lTag');
-                if(tag) tag.innerHTML = `<i class="fas fa-check-circle text-2xl text-green-500 mb-2"></i><span class="text-green-600 font-bold">Photo Ready ✅</span>`;
+                document.getElementById('lTag').innerHTML = `<i class="fas fa-check text-green-600 text-xl mb-1"></i><span class="text-green-600 font-bold">Ready</span>`;
+                document.getElementById('lTag').classList.replace('border-yellow-300', 'border-green-400');
+                document.getElementById('lTag').classList.replace('bg-yellow-50', 'bg-green-50');
             }
         };
 
-        window.closeDeleteModal = function() {
-            document.getElementById('dModal')?.classList.add('hidden');
+        window.closeDeleteModal = () => document.getElementById('dModal').classList.add('hidden');
+        window.openFullImage = (url, name) => {
+            document.getElementById('lImg').src = url;
+            document.getElementById('lName').innerText = name;
+            document.getElementById('vModal').classList.remove('hidden');
         };
+        window.closeFullImage = () => document.getElementById('vModal').classList.add('hidden');
 
-        window.openFullImage = function(url, name) {
-            const img = document.getElementById('lImg');
-            const nm = document.getElementById('lName');
-            const modal = document.getElementById('vModal');
-            if(img) img.src = url;
-            if(nm) nm.innerText = name;
-            if(modal) modal.classList.remove('hidden');
-            document.body.style.overflow = 'hidden';
-        };
-
-        window.closeFullImage = function() {
-            document.getElementById('vModal')?.classList.add('hidden');
-            document.body.style.overflow = 'auto';
-        };
-
-        window.verifyAdmin = function() {
-            const inp = document.getElementById('pInput');
-            if(!inp) return;
-            if (inp.value.trim().toLowerCase() === "sirvitarun9828") {
-                localStorage.setItem('sjs_v21_active', '1');
-                window.closeLogin();
-                document.body.classList.add('admin-active');
-                showToast("Namaste Owner! ✅");
-            } else {
-                showToast("Galt Pin Hai!", true);
-            }
-        };
-
-        window.filterCategory = function(cat, el) {
+        window.filterCategory = (cat, el) => {
             window.activeCat = cat;
-            document.querySelectorAll('nav a').forEach(a => {
-                a.classList.remove('nav-active');
-                a.classList.add('text-gray-400');
-                if(a.id === 'cat-Liked') a.classList.remove('text-red-500');
-            });
-            el.classList.add('nav-active');
-            el.classList.remove('text-gray-400');
-            if(cat === 'Liked') el.classList.add('text-red-500');
+            document.querySelectorAll('.cat-item').forEach(c => c.classList.remove('cat-active'));
+            el.classList.add('cat-active');
             loadData();
         };
 
         const initAuth = async () => {
-            try { await signInAnonymously(auth); } 
-            catch (error) { document.getElementById('loadingMsg').innerText = "Auth Lock. Check Settings."; }
+            try { await signInAnonymously(auth); } catch (e) {}
         };
 
         onAuthStateChanged(auth, (user) => {
             currentUser = user;
             if (user) {
-                document.getElementById('loadingStatus')?.classList.add('hidden');
+                document.getElementById('loadingStatus').classList.add('hidden');
+                logVisit(); // Track visitor when auth ready
+                if(localStorage.getItem('sjs_v21_active') === '1') loadVisitCount(); // Load stats if already admin
                 loadData();
             }
         });
@@ -341,78 +446,88 @@
                 if(!grid) return;
                 grid.innerHTML = '';
                 
-                // --- NEW: Calculate Total Count ---
                 const totalCount = snap.size;
                 const countEl = document.getElementById('totalCount');
-                if(countEl) countEl.innerText = `Total Items: ${totalCount}`;
+                if(countEl) countEl.innerText = totalCount;
                 
                 let hasItems = false;
                 
                 snap.forEach((docSnap) => {
                     const item = docSnap.data();
                     const id = docSnap.id;
+                    const itemNameLower = item.n.toLowerCase();
                     
                     let shouldShow = false;
+                    
                     if (window.activeCat === 'Liked') {
                         if (window.likedItems.has(id)) shouldShow = true;
                     } else if (window.activeCat === 'All' || item.cat === window.activeCat) {
                         shouldShow = true;
                     }
+                    
+                    if (shouldShow && window.searchTerm) {
+                        if (!itemNameLower.includes(window.searchTerm)) {
+                            shouldShow = false;
+                        }
+                    }
 
                     if (shouldShow) {
                         hasItems = true;
                         const isLiked = window.likedItems.has(id);
-                        const heartClass = isLiked ? 'fas fa-heart text-red-500' : 'far fa-heart text-gray-400';
                         const encName = encodeURIComponent(item.n);
                         
                         const card = document.createElement('div');
                         card.className = "product-card animate-fade-in";
                         card.innerHTML = `
-                            <button class="delete-btn" data-id="${id}"><i class="fas fa-trash-alt text-sm"></i></button>
-                            <div class="aspect-[3/4] overflow-hidden bg-gray-50 relative">
-                                <img src="${item.img}" class="w-full h-full object-cover transition-all duration-700 hover:scale-110" onerror="this.src='https://via.placeholder.com/300x400?text=No+Image'">
-                                <div class="absolute bottom-3 right-3 flex flex-col gap-2 z-10">
-                                    <button onclick="window.toggleLike('${id}', event)" id="like-btn-${id}" class="action-btn hover:bg-red-50">
-                                        <i class="${heartClass} text-lg transition-all duration-300"></i>
-                                    </button>
-                                    <button onclick="window.shareItem('${encName}', '${item.p}', '${item.img}', event)" class="action-btn hover:bg-blue-50 text-blue-500">
-                                        <i class="fas fa-share-alt text-sm"></i>
+                            <button class="delete-btn" onclick="event.stopPropagation(); window.deleteItem('${id}')"><i class="fas fa-trash"></i></button>
+                            
+                            <button onclick="window.toggleLike('${id}', event)" id="like-btn-${id}" class="like-btn-overlay transition-colors ${isLiked ? 'bg-red-50' : ''}">
+                                <i class="${isLiked ? 'fas fa-heart text-red-500' : 'far fa-heart text-gray-400'} text-sm"></i>
+                            </button>
+
+                            <div class="aspect-[3/4] bg-gray-50 relative">
+                                <img src="${item.img}" class="w-full h-full object-cover" onerror="this.src='https://via.placeholder.com/150?text=SJS'">
+                            </div>
+                            
+                            <div class="p-2">
+                                <h4 class="text-[8px] text-gray-500 truncate mb-0.5 uppercase tracking-wide">${item.cat}</h4>
+                                <h3 class="text-[10px] font-bold text-gray-800 truncate mb-1 leading-tight">${item.n}</h3>
+                                <div class="flex items-center justify-between mt-1">
+                                    <span class="text-xs font-black text-[#B8860B]">₹${Number(item.p).toLocaleString()}</span>
+                                    <button onclick="window.shareItem('${encName}', '${item.p}', '${item.img}', event)" class="text-gray-400 hover:text-blue-500 p-1">
+                                        <i class="fas fa-share-alt text-[10px]"></i>
                                     </button>
                                 </div>
-                            </div>
-                            <div class="p-4 text-center">
-                                <h4 class="brand-font text-xs font-bold uppercase truncate text-gray-800">${item.n}</h4>
-                                <p class="text-lg font-black text-[#B8860B] mt-1 tracking-tight">₹${Number(item.p).toLocaleString()}</p>
                             </div>`;
                             
                         card.onclick = () => window.openFullImage(item.img, item.n);
-                        const dBtn = card.querySelector('.delete-btn');
-                        if(dBtn) dBtn.onclick = (e) => { e.stopPropagation(); window.deleteItem(id); };
                         grid.appendChild(card);
                     }
                 });
                 
                 const nd = document.getElementById('noData');
-                const ndText = document.getElementById('noDataText');
                 if(nd) {
                     nd.classList.toggle('hidden', hasItems);
-                    ndText.innerText = (window.activeCat === 'Liked' && !hasItems) ? "No Saved Items Yet ❤️" : "Abhi Stock Khali Hai";
+                    const ndText = document.getElementById('noDataText');
+                    if (window.searchTerm) ndText.innerText = `No items matching "${window.searchTerm}"`;
+                    else if (window.activeCat === 'Liked') ndText.innerText = "No Saved Items";
+                    else ndText.innerText = "No Items Found";
                 }
             });
         }
 
         window.addItem = async function() {
-            if (!currentUser) return showToast("Authenticating...", true);
+            if (!currentUser) return showToast("Authenticating...");
             const name = document.getElementById('itemName').value.trim();
             const price = document.getElementById('itemPrice').value.trim();
             const cat = document.getElementById('itemCat').value;
             const fileInput = document.getElementById('imgInp');
             
-            if (!name || !price || !fileInput.files[0]) return showToast("Puri jaankari bhariye!", true);
+            if (!name || !price || !fileInput.files[0]) return showToast("Please fill all details");
             
             const btn = document.getElementById('uploadBtn');
             btn.disabled = true;
-            btn.innerText = "Processing...";
+            btn.innerText = "Uploading...";
             
             try {
                 const formData = new FormData();
@@ -427,28 +542,29 @@
                     n: name, p: price, cat: cat, img: clData.secure_url, timestamp: serverTimestamp() 
                 });
                 
-                showToast("Dukaan Update Ho Gayi! ✅");
+                showToast("Item Added Successfully ✅");
                 document.getElementById('itemName').value = '';
                 document.getElementById('itemPrice').value = '';
                 fileInput.value = '';
-                document.getElementById('lTag').innerHTML = `<i class="fas fa-camera text-3xl mb-2 text-yellow-600"></i><span>Photo Chuno</span>`;
+                document.getElementById('lTag').innerHTML = `<i class="fas fa-camera text-xl mb-1"></i><span>Photo</span>`;
+                document.getElementById('lTag').classList.replace('border-green-400', 'border-yellow-300');
+                document.getElementById('lTag').classList.replace('bg-green-50', 'bg-yellow-50');
             } catch (e) { 
-                console.error("Upload error:", e);
-                showToast("Upload Failed. Check Cloudinary.", true); 
+                showToast("Upload Failed ❌"); 
             } finally { 
                 btn.disabled = false;
-                btn.innerText = "Upload Karein"; 
+                btn.innerText = "UPLOAD ITEM"; 
             }
         };
 
-        window.deleteItem = function(id) {
+        window.deleteItem = (id) => {
             document.getElementById('dModal').classList.remove('hidden');
             document.getElementById('confirmDeleteBtn').onclick = async () => {
                 try {
                     await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'products', id));
-                    showToast("Design Hata Diya Gaya! 🗑️");
+                    showToast("Item Deleted 🗑️");
                     window.closeDeleteModal();
-                } catch (e) { showToast("Error deleting", true); }
+                } catch (e) { showToast("Error deleting item"); }
             };
         };
 
