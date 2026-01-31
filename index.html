@@ -29,7 +29,7 @@
         body.admin-active .admin-only { display: block !important; }
         
         .delete-btn { 
-            display: none !important; position: absolute; top: 12px; right: 12px; z-index: 50; 
+            display: none !important; position: absolute; top: 12px; left: 12px; z-index: 50; 
             background: #ef4444; color: white; width: 35px; height: 35px; 
             border-radius: 50%; align-items: center; justify-content: center; 
             box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4); border: 2px solid white;
@@ -37,6 +37,15 @@
         }
         .delete-btn:hover { transform: scale(1.15); background: #b91c1c; }
         body.admin-active .delete-btn { display: flex !important; }
+
+        .action-btn {
+            width: 38px; height: 38px; border-radius: 50%; 
+            display: flex; align-items: center; justify-content: center;
+            background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(4px);
+            transition: all 0.2s; box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+        .action-btn:active { transform: scale(0.9); }
+        .action-btn:hover { transform: scale(1.1); }
 
         .loader-spin { border: 3px solid #f3f3f3; border-top: 3px solid var(--gold); border-radius: 50%; width: 24px; height: 24px; animation: spin 1s linear infinite; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
@@ -61,12 +70,16 @@
         </div>
         
         <nav class="bg-white/95 sticky top-0 z-50 border-b border-gray-100 overflow-x-auto no-scrollbar shadow-sm">
-            <div class="max-w-7xl mx-auto flex justify-center space-x-8 py-5 px-6 whitespace-nowrap text-[11px] font-bold uppercase tracking-[0.15em]">
-                <a id="cat-All" href="javascript:void(0)" onclick="window.filterCategory('All', this)" class="nav-active py-1">Catalogue</a>
+            <div class="max-w-7xl mx-auto flex justify-center space-x-6 md:space-x-8 py-5 px-6 whitespace-nowrap text-[11px] font-bold uppercase tracking-[0.15em]">
+                <a id="cat-All" href="javascript:void(0)" onclick="window.filterCategory('All', this)" class="nav-active py-1">All</a>
                 <a id="cat-Saree" href="javascript:void(0)" onclick="window.filterCategory('Saree', this)" class="text-gray-400 py-1">Sarees</a>
                 <a id="cat-Kurti" href="javascript:void(0)" onclick="window.filterCategory('Kurti', this)" class="text-gray-400 py-1">Kurtis</a>
-                <a id="cat-Mens" href="javascript:void(0)" onclick="window.filterCategory('Mens Wear', this)" class="text-gray-400 py-1">Mens Wear</a>
+                <a id="cat-Mens" href="javascript:void(0)" onclick="window.filterCategory('Mens Wear', this)" class="text-gray-400 py-1">Mens</a>
                 <a id="cat-Other" href="javascript:void(0)" onclick="window.filterCategory('Other', this)" class="text-gray-400 py-1">Other</a>
+                <!-- Liked Tab -->
+                <a id="cat-Liked" href="javascript:void(0)" onclick="window.filterCategory('Liked', this)" class="text-red-500 py-1 flex items-center gap-2">
+                    <i class="fas fa-heart"></i> Saved
+                </a>
             </div>
         </nav>
     </header>
@@ -113,10 +126,13 @@
         <div id="loadingStatus" class="flex flex-col items-center justify-center py-24 text-gray-400 text-center">
             <div class="loader-spin mb-4"></div><p id="loadingMsg" class="text-[11px] uppercase tracking-widest text-gray-600">Connecting to SJS Database...</p>
         </div>
+        
+        <!-- Product Grid -->
         <div id="pGrid" class="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-10"></div>
+        
         <div id="noData" class="hidden flex flex-col items-center justify-center py-20 text-gray-300">
-            <i class="fas fa-couch text-5xl mb-4"></i>
-            <p class="text-xs uppercase font-bold tracking-widest">Abhi Stock Khali Hai</p>
+            <i class="fas fa-heart-broken text-5xl mb-4"></i>
+            <p id="noDataText" class="text-xs uppercase font-bold tracking-widest">Abhi Stock Khali Hai</p>
         </div>
     </main>
 
@@ -151,13 +167,11 @@
     </div>
 
     <script type="module">
-        // Import the functions you need from the SDKs you need
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-analytics.js";
         import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, collection, onSnapshot, addDoc, deleteDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // Your web app's Firebase configuration
         const firebaseConfig = {
             apiKey: "AIzaSyBLlLFFbzRzB4oE-LT4QxbUmukO6SVRJ4I",
             authDomain: "my-side-11eef.firebaseapp.com",
@@ -169,7 +183,6 @@
         };
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'shree-jagadamba-v21';
 
-        // Initialize Firebase
         const app = initializeApp(firebaseConfig);
         const analytics = getAnalytics(app);
         const auth = getAuth(app);
@@ -177,8 +190,15 @@
 
         let currentUser = null;
         window.activeCat = 'All';
+        
+        // --- Safely Load Liked Items ---
+        try {
+            window.likedItems = new Set(JSON.parse(localStorage.getItem('sjs_liked_items') || '[]'));
+        } catch (e) {
+            window.likedItems = new Set();
+            localStorage.setItem('sjs_liked_items', '[]');
+        }
 
-        // toast helper
         const showToast = (msg, isError = false) => {
             const t = document.getElementById('toast');
             if(!t) return;
@@ -188,21 +208,61 @@
             setTimeout(() => t.classList.remove('show'), 4000);
         };
 
-        // Window exposed functions - Registered properly as global functions
+        // --- Optimized Like & Share ---
+        window.toggleLike = function(id, e) {
+            e.stopPropagation();
+            
+            const btn = document.getElementById(`like-btn-${id}`);
+            if(!btn) return;
+            const icon = btn.querySelector('i');
+            
+            if (window.likedItems.has(id)) {
+                window.likedItems.delete(id);
+                icon.className = 'far fa-heart text-gray-400 text-lg transition-all duration-300';
+                showToast("Removed from Saved Items");
+                if(window.activeCat === 'Liked') loadData(); // Instant Refresh
+            } else {
+                window.likedItems.add(id);
+                icon.className = 'fas fa-heart text-red-500 text-lg transition-all duration-300 animate-bounce';
+                showToast("Added to Saved Items ❤️");
+            }
+            
+            localStorage.setItem('sjs_liked_items', JSON.stringify([...window.likedItems]));
+        };
+
+        window.shareItem = async function(encName, price, imgUrl, e) {
+            e.stopPropagation();
+            const name = decodeURIComponent(encName);
+            
+            const shareData = {
+                title: 'Shree Jagadamba Selection',
+                text: `Check out this ${name} for ₹${price}!\nAvailable at Shree Jagadamba Selection, Anavatti.`,
+                url: window.location.href
+            };
+
+            try {
+                if (navigator.share) {
+                    await navigator.share(shareData);
+                } else {
+                    await navigator.clipboard.writeText(`${shareData.text}\nImage: ${imgUrl}`);
+                    showToast("Link Copied to Clipboard! 📋");
+                }
+            } catch (err) {
+                console.log('Share canceled');
+            }
+        };
+
+        // UI Functions
         window.openLogin = function() {
             const modal = document.getElementById('lModal');
             if(modal) modal.classList.remove('hidden');
-            setTimeout(() => {
-                const inp = document.getElementById('pInput');
-                if(inp) inp.focus();
-            }, 100);
+            setTimeout(() => { document.getElementById('pInput')?.focus(); }, 100);
         };
 
         window.closeLogin = function() {
             const modal = document.getElementById('lModal');
             if(modal) modal.classList.add('hidden');
-            const inp = document.getElementById('pInput');
-            if(inp) inp.value = '';
+            if(document.getElementById('pInput')) document.getElementById('pInput').value = '';
         };
 
         window.logoutManual = function() {
@@ -218,8 +278,7 @@
         };
 
         window.closeDeleteModal = function() {
-            const modal = document.getElementById('dModal');
-            if(modal) modal.classList.add('hidden');
+            document.getElementById('dModal')?.classList.add('hidden');
         };
 
         window.openFullImage = function(url, name) {
@@ -233,16 +292,14 @@
         };
 
         window.closeFullImage = function() {
-            const modal = document.getElementById('vModal');
-            if(modal) modal.classList.add('hidden');
+            document.getElementById('vModal')?.classList.add('hidden');
             document.body.style.overflow = 'auto';
         };
 
         window.verifyAdmin = function() {
             const inp = document.getElementById('pInput');
             if(!inp) return;
-            const enteredPin = inp.value.trim().toLowerCase();
-            if (enteredPin === "sirvitarun9828") {
+            if (inp.value.trim().toLowerCase() === "sirvitarun9828") {
                 localStorage.setItem('sjs_v21_active', '1');
                 window.closeLogin();
                 document.body.classList.add('admin-active');
@@ -257,28 +314,26 @@
             document.querySelectorAll('nav a').forEach(a => {
                 a.classList.remove('nav-active');
                 a.classList.add('text-gray-400');
+                if(a.id === 'cat-Liked') a.classList.remove('text-red-500');
             });
+            
             el.classList.add('nav-active');
             el.classList.remove('text-gray-400');
+            if(cat === 'Liked') el.classList.add('text-red-500');
+
             loadData();
         };
 
-        // Firebase Logic
+        // Firebase Auth & Data
         const initAuth = async () => {
-            try {
-                await signInAnonymously(auth);
-            } catch (error) {
-                console.error("Auth error:", error);
-                const msg = document.getElementById('loadingMsg');
-                if(msg) msg.innerText = "Auth Lock. Check Firebase API Key Settings.";
-            }
+            try { await signInAnonymously(auth); } 
+            catch (error) { document.getElementById('loadingMsg').innerText = "Auth Lock. Check Settings."; }
         };
 
         onAuthStateChanged(auth, (user) => {
             currentUser = user;
             if (user) {
-                const loader = document.getElementById('loadingStatus');
-                if(loader) loader.classList.add('hidden');
+                document.getElementById('loadingStatus')?.classList.add('hidden');
                 loadData();
             }
         });
@@ -288,39 +343,71 @@
         function loadData() {
             if (!currentUser) return;
             const pRef = collection(db, 'artifacts', appId, 'public', 'data', 'products');
+            
             onSnapshot(pRef, (snap) => {
                 const grid = document.getElementById('pGrid');
                 if(!grid) return;
                 grid.innerHTML = '';
+                
                 let hasItems = false;
+                
                 snap.forEach((docSnap) => {
                     const item = docSnap.data();
-                    if (window.activeCat === 'All' || item.cat === window.activeCat) {
+                    const id = docSnap.id;
+                    
+                    let shouldShow = false;
+                    if (window.activeCat === 'Liked') {
+                        if (window.likedItems.has(id)) shouldShow = true;
+                    } else if (window.activeCat === 'All' || item.cat === window.activeCat) {
+                        shouldShow = true;
+                    }
+
+                    if (shouldShow) {
                         hasItems = true;
+                        const isLiked = window.likedItems.has(id);
+                        const heartClass = isLiked ? 'fas fa-heart text-red-500' : 'far fa-heart text-gray-400';
+                        
+                        // Safe encode for JS arguments
+                        const encName = encodeURIComponent(item.n);
+                        
                         const card = document.createElement('div');
                         card.className = "product-card animate-fade-in";
                         card.innerHTML = `
-                            <button class="delete-btn" data-id="${docSnap.id}"><i class="fas fa-trash-alt text-sm"></i></button>
-                            <div class="aspect-[3/4] overflow-hidden bg-gray-50">
+                            <button class="delete-btn" data-id="${id}"><i class="fas fa-trash-alt text-sm"></i></button>
+                            
+                            <div class="aspect-[3/4] overflow-hidden bg-gray-50 relative">
                                 <img src="${item.img}" class="w-full h-full object-cover transition-all duration-700 hover:scale-110" onerror="this.src='https://via.placeholder.com/300x400?text=No+Image'">
+                                <div class="absolute bottom-3 right-3 flex flex-col gap-2 z-10">
+                                    <button onclick="window.toggleLike('${id}', event)" id="like-btn-${id}" class="action-btn hover:bg-red-50">
+                                        <i class="${heartClass} text-lg transition-all duration-300"></i>
+                                    </button>
+                                    <button onclick="window.shareItem('${encName}', '${item.p}', '${item.img}', event)" class="action-btn hover:bg-blue-50 text-blue-500">
+                                        <i class="fas fa-share-alt text-sm"></i>
+                                    </button>
+                                </div>
                             </div>
+                            
                             <div class="p-4 text-center">
                                 <h4 class="brand-font text-xs font-bold uppercase truncate text-gray-800">${item.n}</h4>
                                 <p class="text-lg font-black text-[#B8860B] mt-1 tracking-tight">₹${Number(item.p).toLocaleString()}</p>
                             </div>`;
+                            
                         card.onclick = () => window.openFullImage(item.img, item.n);
+                        
                         const dBtn = card.querySelector('.delete-btn');
-                        if(dBtn) {
-                            dBtn.onclick = (e) => {
-                                e.stopPropagation();
-                                window.deleteItem(docSnap.id);
-                            };
-                        }
+                        if(dBtn) dBtn.onclick = (e) => { e.stopPropagation(); window.deleteItem(id); };
+                        
                         grid.appendChild(card);
                     }
                 });
+                
                 const nd = document.getElementById('noData');
-                if(nd) nd.classList.toggle('hidden', hasItems);
+                const ndText = document.getElementById('noDataText');
+                
+                if(nd) {
+                    nd.classList.toggle('hidden', hasItems);
+                    ndText.innerText = (window.activeCat === 'Liked' && !hasItems) ? "No Saved Items Yet ❤️" : "Abhi Stock Khali Hai";
+                }
             });
         }
 
@@ -347,22 +434,17 @@
                 if (!clData.secure_url) throw new Error("Upload Error");
 
                 await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'products'), { 
-                    n: name, 
-                    p: price, 
-                    cat: cat, 
-                    img: clData.secure_url, 
-                    timestamp: serverTimestamp() 
+                    n: name, p: price, cat: cat, img: clData.secure_url, timestamp: serverTimestamp() 
                 });
                 
                 showToast("Dukaan Update Ho Gayi! ✅");
                 document.getElementById('itemName').value = '';
                 document.getElementById('itemPrice').value = '';
                 fileInput.value = '';
-                const tag = document.getElementById('lTag');
-                if(tag) tag.innerHTML = `<i class="fas fa-camera text-3xl mb-2 text-yellow-600"></i><span>Photo Chuno</span>`;
+                document.getElementById('lTag').innerHTML = `<i class="fas fa-camera text-3xl mb-2 text-yellow-600"></i><span>Photo Chuno</span>`;
             } catch (e) { 
                 console.error("Upload error:", e);
-                showToast("Upload Failed. Cloudinary preset 'Unsigned' hona chahiye.", true); 
+                showToast("Upload Failed. Check Cloudinary.", true); 
             } finally { 
                 btn.disabled = false;
                 btn.innerText = "Upload Karein"; 
@@ -370,25 +452,17 @@
         };
 
         window.deleteItem = function(id) {
-            const modal = document.getElementById('dModal');
-            if(modal) modal.classList.remove('hidden');
-            const btn = document.getElementById('confirmDeleteBtn');
-            if(btn) {
-                btn.onclick = async () => {
-                    try {
-                        await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'products', id));
-                        showToast("Design Hata Diya Gaya! 🗑️");
-                        window.closeDeleteModal();
-                    } catch (e) {
-                        showToast("Error deleting", true);
-                    }
-                };
-            }
+            document.getElementById('dModal').classList.remove('hidden');
+            document.getElementById('confirmDeleteBtn').onclick = async () => {
+                try {
+                    await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'products', id));
+                    showToast("Design Hata Diya Gaya! 🗑️");
+                    window.closeDeleteModal();
+                } catch (e) { showToast("Error deleting", true); }
+            };
         };
 
-        if (localStorage.getItem('sjs_v21_active') === '1') {
-            document.body.classList.add('admin-active');
-        }
+        if (localStorage.getItem('sjs_v21_active') === '1') document.body.classList.add('admin-active');
     </script>
 </body>
 </html>
